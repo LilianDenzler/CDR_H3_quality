@@ -1,0 +1,12 @@
+#!/usr/bin/env python
+file= open("/home/lilian/Desktop/structures/Redundant_PDBs.txt","r")
+dic= {}
+list=[]
+for line in file:
+    line=line.replace(',','')
+    line=line.replace('\n','')
+    list=line.split(' ')
+    NR_PDB=list[0]
+    del list[0]
+    dic.update({NR_PDB : list})
+print(dic)
