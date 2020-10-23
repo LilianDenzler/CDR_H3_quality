@@ -3,9 +3,12 @@
 
 
 import os
+import sys
 
 light=[]
 heavy=[]
+
+#argv[1]= direcoty with actual PDBs, argv[2] = directory to keep input sequences
 
 def one_letter_code(residue):
 	dic = {'CYS': 'C', 'ASP': 'D', 'SER': 'S', 'GLN': 'Q', 'LYS': 'K',
@@ -26,24 +29,21 @@ def parser(position,residue,chain_type):
 		string+= '{}{}\t{}\n'.format(chain_type,position,one_res)
 	return (string)
 
-directory = os.fsencode('/home/lilian/Desktop/structures/LH_Combined_Chothia')
-for filename in os.listdir(directory):
+for filename in os.listdir(sys.argv[1]):
 	string=[]
-	file=os.fsdecode(filename)
-	if file.endswith(".pdb")== False:
-		print("this file is not in correct format (i.e. not PDB){}".format(file))
+	file=open(sys.argv[1]+"/"+filename)
+	if filename.endswith(".pdb")== False:
+		print("this file is not in correct format (i.e. not PDB){}".format(filename))
 		continue
-	with open("/home/lilian/Desktop/structures/LH_Combined_Chothia/{}".format(file), "r") as file2:
-		for line in file2:
-			if "ATOM" in line and "CA" in line:
-				fields = line.strip().split()
-				pos= fields[5]
-				res= fields[3]
-				chain= fields [4]
-				string= parser(pos, res, chain)
-	file2.close()
+	for line in file:
+		if "ATOM" in line and "CA" in line:
+			fields = line.strip().split()
+			pos= fields[5]
+			res= fields[3]
+			chain= fields [4]
+			string= parser(pos, res, chain)
+	file.close()
 
-	new_input_file= open("/home/lilian/Desktop/structures/input_Abymod_seq/{}".format(file),"w")
+	new_input_file= open("{}/{}.seq".format(sys.argv[2], filename[:-4]),"w")
 	for i in string:
 		new_input_file.write(i)
-	

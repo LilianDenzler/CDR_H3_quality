@@ -1,23 +1,20 @@
 #!/usr/bin/env python
-file= open("/home/lilian/Desktop/structures/Redundant_PDBs.txt","r")
-dic= {}
-list=[]
-for line in file:
-    line=line.replace(',','')
-    line=line.replace('\n','')
-    list=line.split(' ')
-    NR_PDB=list[0]
-    del list[0]
-    dic.update({NR_PDB : list})
-file.close()
-f = open("/home/lilian/sync_project/abYmod_commands.txt", "a")
-for key in dic:
-    string="abymod -v=3 -k=2 -exclude{} -autoexclude {} >{}".format(dic.get(key), (key+".pdb"), (key+"_model.pdb"))
-    f.write(string + "\n")
-f.close()
+import sys
+import os
+#arg 0=filename; 1=Redundant_PDB file; 2=directory of .seq files; 3=directory to save model.pdb files
+def pass_commands(redundant_file, seq_directory, model_directory):
+    file= open(redundant_file,"r")
+    dic= {}
+    list=[]
+    for line in file:
+        line=line.replace(',','')
+        line=line.replace('\n','')
+        list=line.split(' ')
+        NR_PDB=list[0]
+        dic.update({NR_PDB : list})
+    file.close()
+    bla=""
+    for key in dic:
+        os.system("abymod -v=3 -k=2 -exclude{} {} > {}".format(str(dic.get(key)).strip('[]'), (seq_directory +"/"+key+".pdb"), (model_directory+"/"+key+".model.pdb")))
 
-#then run in termianl using:
-# bash home/lilian/sync_project/abYmod_commands.txt
-#(maybe alter to save *_model in different directory)
-
-#mv *.tpl /new_folder/*.tpl    =>save all template files in seperate folder
+pass_commands(sys.argv[1],sys.argv[2],sys.argv[3])
