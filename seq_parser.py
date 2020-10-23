@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #do chmod +x name_of_script before running
 
-#import atomium
+
 import os
 
 light=[]
@@ -26,8 +26,6 @@ def parser(position,residue,chain_type):
 		string+= '{}{}\t{}\n'.format(chain_type,position,one_res)
 	return (string)
 
-
-counter=0
 directory = os.fsencode('/home/lilian/Desktop/structures/LH_Combined_Chothia')
 for filename in os.listdir(directory):
 	string=[]
@@ -48,5 +46,4 @@ for filename in os.listdir(directory):
 	new_input_file= open("/home/lilian/Desktop/structures/input_Abymod_seq/{}".format(file),"w")
 	for i in string:
 		new_input_file.write(i)
-	counter+=1
-	print(counter)
+	
