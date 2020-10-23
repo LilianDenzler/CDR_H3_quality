@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+#run on remote server -> how to access ProFit on server?
+#can also use  SCRIPT script.txt
+
+for structure in /home/lilian/sync_project/models
+do
+REFERENCE $structure
+MOBILE /home/lilian/sync_project/actual/$structure
+
+#total quality excluding loop (use as feature later)
+DELRZONE H95-102
+FIT >> /home/lilian/sync_project/RMS/$structure
+ZONE CLEAR
+RZONE CLEAR
+
+#local atom-atom RMS calculation => fit loop, calculate RMS over loop
+ZONE H95-H102
+RZONE H95-H102
+FIT >> /home/lilian/sync_project/RMS/$structure
+RESIDUE >> /home/lilian/sync_project/RMS/$structure.fitted_by_res_localAA.pdb
+#save by-residue RMS this so you can evaluate what regions are modeled well or badly
+ZONE CLEAR
+RZONE CLEAR
+
+#local Ca-Ca RMS calculation=> fit loop, calculate RMS over loop
+ATOMS CA
+ZONE H95-H102
+RZONE H95-H102
+FIT >> /home/lilian/sync_project/RMS/$structure
+RESIDUE >> /home/lilian/sync_project/RMS/$structure.fitted_by_res_localCA.pdb
+#save by-residue RMS this so you can evaluate what regions are modeled well or badly
+ZONE CLEAR
+RZONE CLEAR
+
+#global atom-atom RMS calculation=> fit all, calculate RMS over loop
+ATOMS *
+RZONE H95-H102
+FIT >> /home/lilian/sync_project/RMS/$structure
+RESIDUE >> /home/lilian/sync_project/RMS/$structure.fitted_by_res_globalAA.pdb
+#save by-residue RMS this so you can evaluate what regions are modeled well or badly
+ZONE CLEAR
+RZONE CLEAR
+
+
+#global CA-RMS calculation=> fit all, calculate RMS over loop
+ATOMS *
+RZONE H95-H102
+FIT >> /home/lilian/sync_project/RMS/$structure
+RESIDUE >> /home/lilian/sync_project/RMS/$structure.fitted_by_res_globalCA.pdb
+#save by-residue RMS this so you can evaluate what regions are modeled well or badly
+ZONE CLEAR
+RZONE CLEAR
+
+
+done
