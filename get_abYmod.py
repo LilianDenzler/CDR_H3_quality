@@ -19,3 +19,5 @@ f.close()
 #then run in termianl using:
 # bash home/lilian/sync_project/abYmod_commands.txt
 #(maybe alter to save *_model in different directory)
+
+#mv *.tpl /new_folder/*.tpl    =>save all template files in seperate folder
