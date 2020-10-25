@@ -1,9 +1,5 @@
-#!/usr/bin/env bash
 #run on remote server -> how to access ProFit on server?
-#can also use  SCRIPT script.txt
 
-for structure in /home/lilian/sync_project/models
-do
 REFERENCE $structure
 MOBILE /home/lilian/sync_project/actual/$structure
 

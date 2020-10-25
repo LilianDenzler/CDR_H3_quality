@@ -26,7 +26,8 @@ def parser(position,residue,chain_type):
 	global string
 	for i in zip(position, residue, chain_type):
 		one_res=one_letter_code(residue)
-		string+= '{}{}\t{}\n'.format(chain_type,position,one_res)
+		if chain_type=="H" or chain_type=="L":
+			string+= '{}{}\t{}\n'.format(chain_type,position,one_res)
 	return (string)
 
 for filename in os.listdir(sys.argv[1]):
