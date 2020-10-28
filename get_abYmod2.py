@@ -12,25 +12,30 @@ def pass_commands(redundant_file, seq_directory, model_directory):
     dic= {}
     list=[]
     for line in file:
-        line=line[:-1]
         line=line.replace('\n','')
-        list=line.split(', ')
+        list=line.split(',')
+        for i in list:
+            i.replace(" ","")
         list2=[]
         actual_seq_name=list[0]
         for i in list:
-            PDB_code=(i[:i.find("_")])
+            if len(i)>4:
+                new_code=i.split("_")
+                nr=str(int(new_code[1])-1)
+                letters=new_code[0].lower().replace(" ","")
+                PDB_code=letters+nr
+            else:
+                PDB_code=i.lower().replace(" ","")
             list2.append(PDB_code)
         dic.update({actual_seq_name : list2})
     file.close()
-    print(actual_seq_name)
-    print(dic.get(actual_seq_name))
     for key in dic:
         #command=shlex.split("abymod -v=3 -k=2 -exclude {} {} > {}".format(str(dic.get(key)).strip('[]').replace("'",""), (seq_directory+actual_seq_name+".seq"), (model_directory+actual_seq_name+".pdb.model")))
         #enter= subprocess.Popen(command, shell=True)
         to_exclude=str(dic.get(key)).strip('[]').replace("'","").replace(" ", "")
         key2=str(key).replace("'","")
-        print("abymod -v=3 -exclude={} -k=2 {} > {}".format(to_exclude, os.path.join(seq_directory+key2+".seq"), os.path.join(model_directory+key2+".pdb.model")))
-        #os.system("abymod -v=3 -exclude={} -k {} > {}".format(to_exclude, os.path.join(seq_directory+key2+".seq"), os.path.join(model_directory+key2+".pdb.model")))
+        #print("abymod -v=3 -exclude={} -k=2 {} > {}".format(to_exclude, os.path.join(seq_directory+key2+".seq"), os.path.join(model_directory+key2+".pdb.model")))
+        os.system("abymod -v=3 -exclude={} -k {} > {}".format(to_exclude, os.path.join(seq_directory+key2+".seq"), os.path.join(model_directory+key2+".pdb.model")))
 
 
 def save_templates_seperately(seq_directory, model_directory):
@@ -46,4 +51,4 @@ if sys.argv[3].endswith("/")== False:
     sys.argv[3]=sys.argv[3]+"/"
 
 pass_commands(sys.argv[1],sys.argv[2],sys.argv[3])
-#save_templates_seperately(sys.argv[2],sys.argv[3])
+save_templates_seperately(sys.argv[2],sys.argv[3])
