@@ -1,0 +1,27 @@
+#!/usr/bin/env python
+#python3 save_RMS ~/git/CDR_H3_quality/RMS_calc ~/sync_project/actual_PDBs_NR ~/sync_project/abYmod_structures
+#nohup python3 get_abYmod2.py /home/lilian/sync_project/Redundant_PDBs.txt /home/lilian/sync_project/input_Abymod_seq/ /home/lilian/sync_project/abYmod_structures/ &>output_abymod.log &
+import sys
+import os
+'''
+def pass_Profit_commands (script_name, actual_directory, model_directory):
+  for filename in os.listdir(actual_directory):
+    #check if model file isnt empty
+    os.system("./profit -f {} -h {} {}".format(script_name, os.path.join(actual_directory,filename), os.path.join(model_directory,filename+".model")))
+    for line in sys.stdin:
+        RMS=open(os.path.join(model_directory,filename,RMS),'w+')
+        RMS.write(line)
+        RMS.close()
+
+pass_Profit_commands(sys.argv[1],sys.argv[2],sys.argv[3])
+'''
+script_name=sys.argv[1]
+actual_directory=sys.argv[2]
+model_directory=sys.argv[3]
+for filename in os.listdir(actual_directory):
+  #check if model file isnt empty
+  command=os.popen("./profit -f {} -h {} {}".format(script_name, os.path.join(actual_directory,filename), os.path.join(model_directory,filename+".model"))).read()
+  RMS=open(os.path.join(model_directory,filename),'w+')
+  RMS.write(command)
+  for line in RMS:
+      

@@ -35,7 +35,7 @@ def pass_commands(redundant_file, seq_directory, model_directory):
         to_exclude=str(dic.get(key)).strip('[]').replace("'","").replace(" ", "")
         key2=str(key).replace("'","")
         #print("abymod -v=3 -exclude={} -k=2 {} > {}".format(to_exclude, os.path.join(seq_directory+key2+".seq"), os.path.join(model_directory+key2+".pdb.model")))
-        os.system("abymod -v=3 -exclude={} -k {} > {}".format(to_exclude, os.path.join(seq_directory+key2+".seq"), os.path.join(model_directory+key2+".pdb.model")))
+        os.system("abymod -v=3 -exclude={} -k {} > {}".format(to_exclude, os.path.join(seq_directory,key2+".seq"), os.path.join(model_directory,key2+".pdb.model")))
 
 
 def save_templates_seperately(seq_directory, model_directory):
@@ -45,10 +45,10 @@ def save_templates_seperately(seq_directory, model_directory):
             shutil.move(os.path.join(seq_directory+filename), os.path.join(tpl_directory+filename))
 
 
-if sys.argv[2].endswith("/")== False:
+'''if sys.argv[2].endswith("/")== False:
     sys.argv[2]=sys.argv[2]+"/"
 if sys.argv[3].endswith("/")== False:
-    sys.argv[3]=sys.argv[3]+"/"
+    sys.argv[3]=sys.argv[3]+"/"'''
 
 pass_commands(sys.argv[1],sys.argv[2],sys.argv[3])
 save_templates_seperately(sys.argv[2],sys.argv[3])

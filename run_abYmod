@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+nohup python3 get_abYmod2.py /home/lilian/sync_project/Redundant_PDBs.txt /home/lilian/sync_project/input_Abymod_seq/ /home/lilian/sync_project/abYmod_structures/ &>output_abymod.log &
+
+PID1=$!

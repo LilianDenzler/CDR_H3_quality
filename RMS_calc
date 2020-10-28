@@ -1,51 +1,56 @@
-#run on remote server -> how to access ProFit on server?
 
-REFERENCE $structure
-MOBILE /home/lilian/sync_project/actual/$structure
+#total quality excluding loop (use as feature later), doesnt work with DELZONE
 
-#total quality excluding loop (use as feature later)
-DELRZONE H95-102
-FIT >> /home/lilian/sync_project/RMS/$structure
-ZONE CLEAR
-RZONE CLEAR
-
-#local atom-atom RMS calculation => fit loop, calculate RMS over loop
+#local atom-atom
 ZONE H95-H102
 RZONE H95-H102
-FIT >> /home/lilian/sync_project/RMS/$structure
-RESIDUE >> /home/lilian/sync_project/RMS/$structure.fitted_by_res_localAA.pdb
-#save by-residue RMS this so you can evaluate what regions are modeled well or badly
+IGNORE
+FIT
+
+#local atom-atom by residue
+RESIDUE
 ZONE CLEAR
 RZONE CLEAR
 
-#local Ca-Ca RMS calculation=> fit loop, calculate RMS over loop
+
+
+
+#local Ca-Ca
 ATOMS CA
 ZONE H95-H102
 RZONE H95-H102
-FIT >> /home/lilian/sync_project/RMS/$structure
-RESIDUE >> /home/lilian/sync_project/RMS/$structure.fitted_by_res_localCA.pdb
-#save by-residue RMS this so you can evaluate what regions are modeled well or badly
+IGNORE
+FIT
+
+#local Ca-Ca by residue
+RESIDUE
 ZONE CLEAR
 RZONE CLEAR
 
-#global atom-atom RMS calculation=> fit all, calculate RMS over loop
+
+
+
+#global atom-atom
 ATOMS *
 RZONE H95-H102
-FIT >> /home/lilian/sync_project/RMS/$structure
-RESIDUE >> /home/lilian/sync_project/RMS/$structure.fitted_by_res_globalAA.pdb
-#save by-residue RMS this so you can evaluate what regions are modeled well or badly
+IGNORE
+FIT
+
+#global atom-atom by residue
+RESIDUE
 ZONE CLEAR
 RZONE CLEAR
 
 
-#global CA-RMS calculation=> fit all, calculate RMS over loop
-ATOMS *
+
+
+#global Ca-Ca
+ATOMS CA
 RZONE H95-H102
-FIT >> /home/lilian/sync_project/RMS/$structure
-RESIDUE >> /home/lilian/sync_project/RMS/$structure.fitted_by_res_globalCA.pdb
-#save by-residue RMS this so you can evaluate what regions are modeled well or badly
+IGNORE
+FIT
+
+#global Ca-Ca by residue
+RESIDUE
 ZONE CLEAR
 RZONE CLEAR
-
-
-done
