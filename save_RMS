@@ -22,17 +22,21 @@ def pass_Profit_commands (script_name, actual_directory, model_directory):
         By_res=open(os.path.join(model_directory,"ProFit_results",filename+ ".profit_by_res"),'w+')
 
     counter=0
+    list_write=[]
     for line in command:
         columns=line.split("    ")
         if len(columns)< 2 and 'RMS:' in line:
             line=line.replace(" ","")
-            RMS.write(line[4:])
+            list_write.append(line[4:])
         if len(columns)>=3 and 'RMS:' in line:
             By_res.write(line)
             counter=1
         elif counter==1:
             By_res.write(" \n")
             counter=0
+    del list_write[4]
+    del list_write[6]
+    RMS.writelines(list_write)
 
     By_res.close()
     RMS.close()
