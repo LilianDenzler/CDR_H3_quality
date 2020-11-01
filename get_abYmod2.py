@@ -39,16 +39,13 @@ def pass_commands(redundant_file, seq_directory, model_directory):
 
 
 def save_templates_seperately(seq_directory, model_directory):
-    tpl_directory=os.mkdir(os.path.join(model_directory+"templates"))
+    tpl_directory=os.mkdir(os.path.join(model_directory,"templates"))
     for filename in os.listdir(seq_directory):
-    	if filename.endswith(".tpl")== False:
-            shutil.move(os.path.join(seq_directory+filename), os.path.join(tpl_directory+filename))
+    	if filename.endswith(".tpl") is True:
+            source=os.path.join(seq_directory,filename)
+            destination=os.path.join(model_directory,"templates",filename)
+            print (destination)
+            shutil.move(source,destination)
 
-
-'''if sys.argv[2].endswith("/")== False:
-    sys.argv[2]=sys.argv[2]+"/"
-if sys.argv[3].endswith("/")== False:
-    sys.argv[3]=sys.argv[3]+"/"'''
-
-pass_commands(sys.argv[1],sys.argv[2],sys.argv[3])
+#pass_commands(sys.argv[1],sys.argv[2],sys.argv[3])
 save_templates_seperately(sys.argv[2],sys.argv[3])

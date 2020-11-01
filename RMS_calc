@@ -1,40 +1,37 @@
 
 #total quality excluding loop (use as feature later), doesnt work with DELZONE
+#do additive zones
+#res to file
 
 #local atom-atom
 ZONE H95-H102
-RZONE H95-H102
 IGNORE
 FIT
 
 #local atom-atom by residue
 RESIDUE
 ZONE CLEAR
-RZONE CLEAR
-
 
 
 
 #local Ca-Ca
 ATOMS CA
 ZONE H95-H102
-RZONE H95-H102
 IGNORE
 FIT
 
 #local Ca-Ca by residue
 RESIDUE
 ZONE CLEAR
-RZONE CLEAR
 
 
 
 
 #global atom-atom
 ATOMS *
-RZONE H95-H102
 IGNORE
 FIT
+RZONE H95-H102
 
 #global atom-atom by residue
 RESIDUE
@@ -43,12 +40,11 @@ RZONE CLEAR
 
 
 
-
 #global Ca-Ca
 ATOMS CA
-RZONE H95-H102
 IGNORE
 FIT
+RZONE H95-H102
 
 #global Ca-Ca by residue
 RESIDUE

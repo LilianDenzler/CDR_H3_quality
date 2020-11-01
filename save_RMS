@@ -1,27 +1,58 @@
 #!/usr/bin/env python
 #python3 save_RMS ~/git/CDR_H3_quality/RMS_calc ~/sync_project/actual_PDBs_NR ~/sync_project/abYmod_structures
 #nohup python3 get_abYmod2.py /home/lilian/sync_project/Redundant_PDBs.txt /home/lilian/sync_project/input_Abymod_seq/ /home/lilian/sync_project/abYmod_structures/ &>output_abymod.log &
+#python3 ~/git/CDR_H3_quality/save_RMS ~/git/CDR_H3_quality/RMS_calc ~/sync_project/actual_PDBs_NR_test ~/sync_project/abYmod_structures_test
 import sys
 import os
-'''
+import numpy as np
+
 def pass_Profit_commands (script_name, actual_directory, model_directory):
   for filename in os.listdir(actual_directory):
     #check if model file isnt empty
-    os.system("./profit -f {} -h {} {}".format(script_name, os.path.join(actual_directory,filename), os.path.join(model_directory,filename+".model")))
-    for line in sys.stdin:
-        RMS=open(os.path.join(model_directory,filename,RMS),'w+')
-        RMS.write(line)
-        RMS.close()
+    dict_RMS={}
+    for filename in os.listdir(actual_directory):
+        name= filename.replace(".pdb","")
+        #check if model file isnt empty
+        command=os.popen("./profit -f {} -h {} {}".format(script_name, os.path.join(actual_directory,filename), os.path.join(model_directory,filename+".model"))).readlines()
+        tmp=open(os.path.join(model_directory,"ProFit_results",filename + ".profittemp"),'w+')
+        tmp.writelines(command)
+        RMS=open(os.path.join(model_directory,"ProFit_results",filename + ".profit"),'w+')
+        if not os.path.exists(os.path.join(model_directory,"ProFit_results")):
+            os.makedirs(os.path.join(model_directory,"ProFit_results"))
+        By_res=open(os.path.join(model_directory,"ProFit_results",filename+ ".profit_by_res"),'w+')
+
+    counter=0
+    for line in command:
+        columns=line.split("    ")
+        if len(columns)< 2 and 'RMS:' in line:
+            line=line.replace(" ","")
+            RMS.write(line[4:])
+        if len(columns)>=3 and 'RMS:' in line:
+            By_res.write(line)
+            counter=1
+        elif counter==1:
+            By_res.write(" \n")
+            counter=0
+
+    By_res.close()
+    RMS.close()
+
+
+'''
+The .profit output file will have the following lines:
+RMS local atom-to-ATOM
+RMS local Ca-to-Ca
+RMS global atom-to-atom whole Ab
+RMS global atom-to-atom just loop
+RMS global Ca-to-Ca whole Ab
+RMS global Ca-to-Ca just loop
+
+The .profit_by_res file will have the following lines:
+RMS local atom-to-ATOM by residue
+RMS local Ca-to-Ca by residue
+RMS global atom-to-atom by residue
+RMS global Ca-to-Ca by residue
+
+'''
 
 pass_Profit_commands(sys.argv[1],sys.argv[2],sys.argv[3])
-'''
-script_name=sys.argv[1]
-actual_directory=sys.argv[2]
-model_directory=sys.argv[3]
-for filename in os.listdir(actual_directory):
-  #check if model file isnt empty
-  command=os.popen("./profit -f {} -h {} {}".format(script_name, os.path.join(actual_directory,filename), os.path.join(model_directory,filename+".model"))).read()
-  RMS=open(os.path.join(model_directory,filename),'w+')
-  RMS.write(command)
-  for line in RMS:
-      
