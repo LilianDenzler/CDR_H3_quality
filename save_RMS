@@ -9,7 +9,6 @@ import numpy as np
 def pass_Profit_commands (script_name, actual_directory, model_directory):
   for filename in os.listdir(actual_directory):
     #check if model file isnt empty
-    dict_RMS={}
     for filename in os.listdir(actual_directory):
         name= filename.replace(".pdb","")
         #check if model file isnt empty
@@ -58,5 +57,14 @@ RMS global atom-to-atom by residue
 RMS global Ca-to-Ca by residue
 
 '''
+def make_feature_csv(model_directory):
+    if not os.path.exists(os.path.join(model_directory,"ProFit_results","feature_csv")):
+        os.makedirs(os.path.join(model_directory,"ProFit_results","feature_csv"))
+    RMS_feauture_csv=open(os.path.join(model_directory,"ProFit_results","feature_csv",filename + ".profit"),'w+')
+    for filename in os.listdir(os.path.join(model_directory,"ProFit_results")):
+        results=open(os.path.join(model_directory,"ProFit_results",filename + ".profit"),'r')
+        name= filename.replace(".pdb","")
+        for line in results
+
 
 pass_Profit_commands(sys.argv[1],sys.argv[2],sys.argv[3])
