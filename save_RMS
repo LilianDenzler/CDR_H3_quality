@@ -5,6 +5,7 @@
 import sys
 import os
 import numpy as np
+import csv
 
 def pass_Profit_commands (script_name, actual_directory, model_directory):
   for filename in os.listdir(actual_directory):
@@ -13,9 +14,7 @@ def pass_Profit_commands (script_name, actual_directory, model_directory):
         name= filename.replace(".pdb","")
         #check if model file isnt empty
         command=os.popen("./profit -f {} -h {} {}".format(script_name, os.path.join(actual_directory,filename), os.path.join(model_directory,filename+".model"))).readlines()
-        tmp=open(os.path.join(model_directory,"ProFit_results",filename + ".profittemp"),'w+')
-        tmp.writelines(command)
-        RMS=open(os.path.join(model_directory,"ProFit_results",filename + ".profit"),'w+')
+        #RMS=open(os.path.join(model_directory,"ProFit_results",filename + ".profit"),'w+')
         if not os.path.exists(os.path.join(model_directory,"ProFit_results")):
             os.makedirs(os.path.join(model_directory,"ProFit_results"))
         By_res=open(os.path.join(model_directory,"ProFit_results",filename+ ".profit_by_res"),'w+')
@@ -26,6 +25,7 @@ def pass_Profit_commands (script_name, actual_directory, model_directory):
         columns=line.split("    ")
         if len(columns)< 2 and 'RMS:' in line:
             line=line.replace(" ","")
+            line=line.replace("\n","")
             list_write.append(line[4:])
         if len(columns)>=3 and 'RMS:' in line:
             By_res.write(line)
@@ -35,10 +35,22 @@ def pass_Profit_commands (script_name, actual_directory, model_directory):
             counter=0
     del list_write[4]
     del list_write[6]
-    RMS.writelines(list_write)
+    list_write.append(name)
+    print(list_write)
+    columns=["local_AA","local_CA","global_AA_full","global_AA", "global_CA_full","global_CA","ID"]
+    if os.path.exists(os.path.join(model_directory,"ProFit_results","RMS_feature_csv" + ".profit")):
+        with open(os.path.join(model_directory,"ProFit_results","RMS_feature_csv" + ".profit"), "a") as f:
+            writer = csv.writer(f, delimiter='\t')
+            writer.writerow(list_write)
+    else:
+        with open(os.path.join(model_directory,"ProFit_results","RMS_feature_csv" + ".profit"),"w") as f:
+            writer = csv.writer(f, delimiter='\t')
+            writer.writerow(columns)
+            writer.writerow(list_write)
+
 
     By_res.close()
-    RMS.close()
+    f.close()
 
 
 '''
@@ -49,6 +61,7 @@ RMS global atom-to-atom whole Ab
 RMS global atom-to-atom just loop
 RMS global Ca-to-Ca whole Ab
 RMS global Ca-to-Ca just loop
+PDB ID
 
 The .profit_by_res file will have the following lines:
 RMS local atom-to-ATOM by residue
@@ -57,14 +70,5 @@ RMS global atom-to-atom by residue
 RMS global Ca-to-Ca by residue
 
 '''
-def make_feature_csv(model_directory):
-    if not os.path.exists(os.path.join(model_directory,"ProFit_results","feature_csv")):
-        os.makedirs(os.path.join(model_directory,"ProFit_results","feature_csv"))
-    RMS_feauture_csv=open(os.path.join(model_directory,"ProFit_results","feature_csv",filename + ".profit"),'w+')
-    for filename in os.listdir(os.path.join(model_directory,"ProFit_results")):
-        results=open(os.path.join(model_directory,"ProFit_results",filename + ".profit"),'r')
-        name= filename.replace(".pdb","")
-        for line in results
-
 
 pass_Profit_commands(sys.argv[1],sys.argv[2],sys.argv[3])
