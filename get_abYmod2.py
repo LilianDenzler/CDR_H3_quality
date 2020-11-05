@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-#python3 get_abYmod.py /home/lilian/sync_project/Redundant_PDBs.txt /home/lilian/sync_project/input_Abymod_seq/ /home/lilian/sync_project/abYmod_structures/
+#python3 get_abYmod2.py /home/lilian/sync_project/Redundant_PDBs.txt /home/lilian/sync_project/input_Abymod_seq/ /home/lilian/sync_project/abYmod_structures/
+#nohup python3 get_abYmod2.py /home/lilian/sync_project/Redundant_PDBs.txt /home/lilian/sync_project/input_Abymod_seq/ /home/lilian/sync_project/abYmod_structures/ &>output_abymod.log &
 import sys
 import os
 #import shlex
@@ -39,13 +40,19 @@ def pass_commands(redundant_file, seq_directory, model_directory):
 
 
 def save_templates_seperately(seq_directory, model_directory):
-    tpl_directory=os.mkdir(os.path.join(model_directory,"templates"))
-    for filename in os.listdir(seq_directory):
-    	if filename.endswith(".tpl") is True:
-            source=os.path.join(seq_directory,filename)
-            destination=os.path.join(model_directory,"templates",filename)
-            print (destination)
-            shutil.move(source,destination)
+    if os.path.exists(os.path.join(model_directory,"templates")):
+        for filename in os.listdir(seq_directory):
+            if ".tpl" in filename:
+                source=os.path.join(seq_directory,filename)
+                destination=os.path.join(model_directory,"templates",filename)
+                shutil.move(source,destination)
+    else:
+        tpl_directory=os.mkdir(os.path.join(model_directory,"templates"))
+        for filename in os.listdir(seq_directory):
+            if ".tpl" in filename:
+                source=os.path.join(seq_directory,filename)
+                destination=os.path.join(model_directory,"templates", filename)
+                shutil.move(source, destination)
 
-#pass_commands(sys.argv[1],sys.argv[2],sys.argv[3])
+pass_commands(sys.argv[1],sys.argv[2],sys.argv[3])
 save_templates_seperately(sys.argv[2],sys.argv[3])
