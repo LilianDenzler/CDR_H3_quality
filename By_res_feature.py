@@ -20,7 +20,7 @@ def pass_Profit_commands (profit_directory, feature_directory):
             global_CA2=[]
             counter=0
             name=file.replace(".pdb.model.profit_by_res","")
-            print(name)
+            #print(name)
             for line in f:
                 if ":" in line:
                     if counter==0:
@@ -51,14 +51,17 @@ def pass_Profit_commands (profit_directory, feature_directory):
                 pos=pos[1:]
                 aa=i[1]
                 local_AA_RMS.update({rms:[pos,aa]})
-            print(local_AA_RMS)
+            #print(local_AA_RMS)
             worst_rms=max(list(local_AA_RMS.keys()))
-            print("worst",worst_rms)
+            #print("worst",worst_rms)
             write=[]
-            write.append(worst_rms)
+            if float(worst_rms) > 5:
+                write.append(1)
+            else:
+                write.append(0)
             write.append(local_AA_RMS[worst_rms][0])
             write.append(local_AA_RMS[worst_rms][1])
-            print(write)
+            #print(write)
 
         columns=["RMSD","Pos","AA"]
         if os.path.exists(os.path.join(feature_directory,"RMS_by_res_feature_csv_localAA" + ".csv")):
