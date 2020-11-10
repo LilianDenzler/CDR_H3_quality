@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-#python3 save_RMS ~/git/CDR_H3_quality/RMS_calc ~/sync_project/actual_PDBs_NR ~/sync_project/abYmod_structures
+#python3 save_RMS ~/git/CDR_H3_quality/RMS_calc ~/sync_project/actual_PDBs_NR ~/sync_project/abYmod_structures ~/sync_project/Feature
 
 import sys
 import os
 import csv
 
-def pass_Profit_commands (script_name, actual_directory, model_directory):
+def pass_Profit_commands (script_name, actual_directory, model_directory, feature_directory):
     check_empty_model=os.popen("find {} -type f -empty".format(model_directory)).readlines()
     fails=open(os.path.join(actual_directory,"fails"),'w+')
     fails_list=[]
@@ -56,12 +56,12 @@ def pass_Profit_commands (script_name, actual_directory, model_directory):
             print(list_write)
             #print(list_write)
             columns=["local_AA","local_CA","global_AA_full","global_AA", "global_CA_full","global_CA","ID"]
-            if os.path.exists(os.path.join(model_directory,"ProFit_results","RMS_feature_csv" + ".profit")):
-                with open(os.path.join(model_directory,"ProFit_results","RMS_feature_csv" + ".profit"), "a") as f:
+            if os.path.exists(os.path.join(feature_directory,"ProFit_results","RMS_feature_csv" + ".profit")):
+                with open(os.path.join(feature_directory,"ProFit_results","RMS_feature_csv" + ".profit"), "a") as f:
                     writer = csv.writer(f, delimiter='\t')
                     writer.writerow(list_write)
             else:
-                with open(os.path.join(model_directory,"ProFit_results","RMS_feature_csv" + ".profit"),"w") as f:
+                with open(os.path.join(feature_directory,"ProFit_results","RMS_feature_csv" + ".profit"),"w") as f:
                     writer = csv.writer(f, delimiter='\t')
                     writer.writerow(columns)
                     writer.writerow(list_write)
@@ -86,4 +86,4 @@ RMS global atom-to-atom by residue
 RMS global Ca-to-Ca by residue
 '''
 
-pass_Profit_commands(sys.argv[1],sys.argv[2],sys.argv[3])
+pass_Profit_commands(sys.argv[1],sys.argv[2],sys.argv[3], sys.argv[4])
