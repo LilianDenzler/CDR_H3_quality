@@ -26,9 +26,7 @@ def pass_Profit_commands (script_name, actual_directory, model_directory, featur
         else:
             command=os.popen("./profit -f {} -h {} {}".format(script_name, os.path.join(actual_directory,name+".pdb"), os.path.join(model_directory,name+".pdb"+".model"))).readlines()
             #RMS=open(os.path.join(model_directory,"ProFit_results",filename + ".profit"),'w+')
-            if not os.path.exists(os.path.join(model_directory,"ProFit_results")):
-                os.makedirs(os.path.join(model_directory,"ProFit_results"))
-            By_res=open(os.path.join(model_directory,"ProFit_results",filename+ ".profit_by_res"),'w+')
+            By_res=open(os.path.join(feature_directory,"ProFit_results",filename+ ".profit_by_res"),'w+')
 
             counter=0
             list_write=[]
@@ -46,7 +44,7 @@ def pass_Profit_commands (script_name, actual_directory, model_directory, featur
                     By_res.write(" \n")
                     counter=0
 
-            if len(list_write)>7: #checks that there are no errors, as otherwise less RMSD values will be given
+            if len(list_write)>7:
                 del list_write[2]
                 del list_write[3]
                 del list_write[3]
@@ -55,14 +53,14 @@ def pass_Profit_commands (script_name, actual_directory, model_directory, featur
             list_write.append(name)
             print(list_write)
             #print(list_write)
-            columns=["local_AA","local_CA","global_AA_full","global_AA", "global_CA_full","global_CA","ID"]
-            if os.path.exists(os.path.join(feature_directory,"ProFit_results","RMS_feature_csv" + ".profit")):
-                with open(os.path.join(feature_directory,"ProFit_results","RMS_feature_csv" + ".profit"), "a") as f:
-                    writer = csv.writer(f, delimiter='\t')
+            columns=["local_AA","local_CA","global_AA","global_CA","ID"]
+            if os.path.exists(os.path.join(feature_directory,"RMS_feature_csv" + ".csv")):
+                with open(os.path.join(feature_directory,"RMS_feature_csv" + ".csv"), "a") as f:
+                    writer = csv.writer(f)
                     writer.writerow(list_write)
             else:
-                with open(os.path.join(feature_directory,"ProFit_results","RMS_feature_csv" + ".profit"),"w") as f:
-                    writer = csv.writer(f, delimiter='\t')
+                with open(os.path.join(feature_directory,"RMS_feature_csv" + ".csv"),"w") as f:
+                    writer = csv.writer(f)
                     writer.writerow(columns)
                     writer.writerow(list_write)
 

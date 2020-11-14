@@ -1,0 +1,21 @@
+#!/usr/bin/env python
+#python3 templates_dic /home/lilian/sync_project/NOSYNC/abYmod_structures/templates
+import sys
+import os
+
+template_directory=sys.argv[1]
+import re
+dic_all_templates={}
+for filename in os.listdir(template_directory):
+  with open(os.path.join(template_directory,filename)) as file:
+    list2=[]
+    for line in file:
+      if 'CDRTEMPLATE: H3' in line:
+        list=line.split(" ")
+        del list[0]
+        del list[0]
+        list2+=[w.replace("\n","") for w in list]
+    name=filename.replace(".seq.tpl",'')
+    add=",".join(list2)  #only if you want as sting, not  list
+    dic_all_templates.update({name: add})
+print (dic_all_templates)
