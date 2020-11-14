@@ -216,6 +216,63 @@ def BLOSUM_62():
 def BLOSUM_50():
     pass
 
+def similarity_score(feature_directory,input_seq_directory, log_directory):
+    for filename in os.listdir(log_directory):
+        name= filename.replace(".log","")
+        with open(os.path.join(log_directory,filename)) as infile:
+            for line in infile:
+                if "Finding best templates for CDR-H3" in line:
+                    score=line.replace("Finding best scores for CDR-H3", "")
+                    score=score.replace("(BestScore: ", "")
+                    score=score.replace(".", "")
+                    score=score.replace(")", "")
+                    score=float(score)
+                    write=[score, name]
+                if "Framework template H:" in line:
+                    template= line.replace("Framework template H: ")
+                    with open(os.path.join("/usr/local/apps/abymod/DATA/abseqlib", template+ ".seq")) as f:
+                        copy = False
+                        tpl_sequence=[]
+                        for l in f:
+                            if "H95" in l:
+                                copy = True
+                            if copy==True:
+                                line2=l.split()
+                                aminoacid=line2[1]
+                                tpl_sequence.append(aminoacid)
+                            if "H102" in line:
+                                copy = False
+                    f.close()
+                    with open(os.path.join(input_seq_directory,name +".seq")) as f:
+                        copy = False
+                        sequence=[]
+                        for l in f:
+                            if "H95" in l:
+                                copy = True
+                            if copy==True:
+                                line2=l.split()
+                                aminoacid=line2[1]
+                                sequence.append(aminoacid)
+                            if "H102" in line:
+                                copy = False
+                    f.close()
+                    score=os.system("scoreseqs.pl {} {}".format(tpl_sequence,sequence)
+                    write=[score, name]
+            columnids=["score","ID"]
+            if os.path.exists(os.path.join(feature_directory,"seq_id"+ ".csv")): #use feature_directory,"RMS_by_res_feature_csv_"+dics2[y] + ".csv") for separate files
+                with open(os.path.join(feature_directory,"seq_id" + ".csv"), "a") as f:
+                    writer = csv.writer(f)
+                    writer.writerow(write)
+            else:
+                with open(os.path.join(feature_directory,"seq_id"+ ".csv"),"w") as f:
+                    writer = csv.writer(f)
+                    writer.writerow(columnids)
+                    writer.writerow(write)
+
+
+
+
+
 #also, how many AA of same category after one another
 '''
 Charged (side chains often form salt bridges):
@@ -264,4 +321,5 @@ if __name__=="__main__":
   #get_loop_length(sys.argv[1],sys.argv[2])
   #get_loop_charge(sys.argv[1],sys.argv[2])
   #bulged_non_bulged(sys.argv[1],sys.argv[2], sys.argv[3], sys.argv[4])
-  merge_csv(sys.argv[1], sys.argv[2],sys.argv[3])
+  #merge_csv(sys.argv[1], sys.argv[2],sys.argv[3])
+  similarity_score(sys.argv[1],sys.argv[2], sys.argv[3])
