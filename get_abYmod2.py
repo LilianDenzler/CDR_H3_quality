@@ -36,7 +36,7 @@ def pass_commands(redundant_file, seq_directory, model_directory):
         to_exclude=str(dic.get(key)).strip('[]').replace("'","").replace(" ", "")
         key2=str(key).replace("'","")
         #print("abymod -v=3 -exclude={} -k=2 {} > {}".format(to_exclude, os.path.join(seq_directory+key2+".seq"), os.path.join(model_directory+key2+".pdb.model")))
-        os.system("abymod -v=3 -exclude={} -k {} > {} 2>{}".format(to_exclude, os.path.join(seq_directory,key2+".seq"), os.path.join(model_directory,key2+".pdb.model"), os.path.join(model_directory,key2+".log")))
+        os.system("abymod -v=4 -exclude={} {} > {} 2>{}".format(to_exclude, os.path.join(seq_directory,key2+".seq"), os.path.join(model_directory,key2+".pdb.model"), os.path.join(model_directory,key2+".log")))
 
 
 def save_templates_seperately(seq_directory, model_directory):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
 import os
-import numpy as np
+#import numpy as np
 import csv
 
 def extract_seq(feature_directory,input_seq_directory):
@@ -216,61 +216,37 @@ def BLOSUM_62():
 def BLOSUM_50():
     pass
 
-def similarity_score(feature_directory,input_seq_directory, log_directory):
+def similarity_score(feature_directory,log_directory):
     for filename in os.listdir(log_directory):
         name= filename.replace(".log","")
         with open(os.path.join(log_directory,filename)) as infile:
             for line in infile:
-                if "Finding best templates for CDR-H3" in line:
-                    score=line.replace("Finding best scores for CDR-H3", "")
-                    score=score.replace("(BestScore: ", "")
-                    score=score.replace(".", "")
-                    score=score.replace(")", "")
-                    score=float(score)
-                    write=[score, name]
-                if "Framework template H:" in line:
-                    template= line.replace("Framework template H: ")
-                    with open(os.path.join("/usr/local/apps/abymod/DATA/abseqlib", template+ ".seq")) as f:
-                        copy = False
-                        tpl_sequence=[]
-                        for l in f:
-                            if "H95" in l:
-                                copy = True
-                            if copy==True:
-                                line2=l.split()
-                                aminoacid=line2[1]
-                                tpl_sequence.append(aminoacid)
-                            if "H102" in line:
-                                copy = False
-                    f.close()
-                    with open(os.path.join(input_seq_directory,name +".seq")) as f:
-                        copy = False
-                        sequence=[]
-                        for l in f:
-                            if "H95" in l:
-                                copy = True
-                            if copy==True:
-                                line2=l.split()
-                                aminoacid=line2[1]
-                                sequence.append(aminoacid)
-                            if "H102" in line:
-                                copy = False
-                    f.close()
-                    score=os.system("scoreseqs.pl {} {}".format(tpl_sequence,sequence)
-                    write=[score, name]
-            columnids=["score","ID"]
-            if os.path.exists(os.path.join(feature_directory,"seq_id"+ ".csv")): #use feature_directory,"RMS_by_res_feature_csv_"+dics2[y] + ".csv") for separate files
-                with open(os.path.join(feature_directory,"seq_id" + ".csv"), "a") as f:
-                    writer = csv.writer(f)
-                    writer.writerow(write)
-            else:
-                with open(os.path.join(feature_directory,"seq_id"+ ".csv"),"w") as f:
-                    writer = csv.writer(f)
-                    writer.writerow(columnids)
-                    writer.writerow(write)
+                print(line)
+               #INFO: CDR-H3 (YEIR/YEWA) SeqID: 0.500 Similarity: 0.381
+                if "INFO: CDR-H3" in line:
+                    output=line.split(" ")
+                    template_target=output[2]
+                    template_target=template_target.split("/")
+                    target=template_target[0]
+                    template= template_target[1]
+                    target=target.replace("(", "")
+                    template=template.replace(")", "")
 
-
-
+                    identity=output[4]
+                    similarity=output[6]
+                    similarity=similarity.replace('"', "")
+                    similarity=similarity.replace("\n","")
+                    write=[identity,similarity, template, target, name]
+                    columnids=["identity","similarity", "template", "target", "ID"]
+                    if os.path.exists(os.path.join(feature_directory,"seq_id"+ ".csv")): #use feature_directory,"RMS_by_res_feature_csv_"+dics2[y] + ".csv") for separate files
+                        with open(os.path.join(feature_directory,"seq_id" + ".csv"), "a") as f:
+                            writer = csv.writer(f)
+                            writer.writerow(write)
+                    else:
+                        with open(os.path.join(feature_directory,"seq_id"+ ".csv"),"w") as f:
+                            writer = csv.writer(f)
+                            writer.writerow(columnids)
+                            writer.writerow(write)
 
 
 #also, how many AA of same category after one another
@@ -306,7 +282,7 @@ Hydrophobic (normally buried inside the protein core):
 • Glycine - Gly - G
 '''
 
-def merge_csv(filea, fileb,feature_directory):
+def merge_csv(filea, fileb, new_name, feature_directory):
     import pandas as pd
     a = pd.read_csv(filea, header=0,sep=',')
     print(a)
@@ -314,7 +290,7 @@ def merge_csv(filea, fileb,feature_directory):
     print(b)
     #b = b.dropna(axis=1)
     merged = a.merge(b, on='ID')
-    merged.to_csv(os.path.join(feature_directory,"output_RMSD_length_kinked_charge.csv"), index=False)
+    merged.to_csv(os.path.join(feature_directory,new_name+".csv"), index=False)
 #python3 feature_extraction.py ~/sync_project/Feature/ ~/sync_project/input_Abymod_seq/
 
 if __name__=="__main__":
@@ -322,4 +298,4 @@ if __name__=="__main__":
   #get_loop_charge(sys.argv[1],sys.argv[2])
   #bulged_non_bulged(sys.argv[1],sys.argv[2], sys.argv[3], sys.argv[4])
   #merge_csv(sys.argv[1], sys.argv[2],sys.argv[3])
-  similarity_score(sys.argv[1],sys.argv[2], sys.argv[3])
+  similarity_score(sys.argv[1],sys.argv[2])
