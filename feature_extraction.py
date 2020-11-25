@@ -70,15 +70,16 @@ def get_loop_charge(feature_directory,input_seq_directory):
             writer = csv.writer(f)
             writer.writerow(write)
 
-def hydrophobicity(feature_directory,input_seq_directory):
-    Hydrophathy_index = {'A': 1.8, 'R': -4.5, "N": -3.5, "D": -3.5, "C": 2.5, "Q": -3.5, "E": -3.5, "G": -0.4, "H": -3.2, "I": 4.5, "L": 3.8, "K": -3.9, "M": 1.9, "F": 2.8, "P": -1.6,
+def happiness_score(feature_directory,actual_directory):
+    '''Hydrophathy_index = {'A': 1.8, 'R': -4.5, "N": -3.5, "D": -3.5, "C": 2.5, "Q": -3.5, "E": -3.5, "G": -0.4, "H": -3.2, "I": 4.5, "L": 3.8, "K": -3.9, "M": 1.9, "F": 2.8, "P": -1.6,
                             "S": -0.8, "T": -0.7, "W": -0.9, "Y": -1.3, "V": 4.2, "X": -0.5}#-0.5 is average
-    columns=["Hydrophathy","Pos", "AA","ID"]
-    with open(os.path.join(feature_directory,"hydropathy_index_feature" + ".csv"),"w") as f:
+    columns=["Hydrophathy","ID"]
+    with open(os.path.join(feature_directory,"hydropathy" + ".csv"),"w") as f:
         writer = csv.writer(f)
         writer.writerow(columns)
     for filename in os.listdir(input_seq_directory):
         name= filename.replace(".seq","")
+        hydro_value=0
         with open(os.path.join(input_seq_directory,filename)) as infile:
             copy = False
             for line in infile:
@@ -88,19 +89,54 @@ def hydrophobicity(feature_directory,input_seq_directory):
                     line2=line.split()
                     aminoacid=line2[1]
                     pos=line2[0][1:]
-                    hydro_values=[Hydrophathy_index[aminoacid],pos,aminoacid,name]
-                    with open(os.path.join(feature_directory,"hydropathy_index_feature" + ".csv"),"a") as f:
-                        writer = csv.writer(f)
-                        writer.writerow(hydro_values)
+                    hydro_value+=Hydrophathy_index[aminoacid]
                 if "H102" in line:
                     copy = False
+            write=[hydro_value,name]
+            with open(os.path.join(feature_directory,"hydropathy_index_feature" + ".csv"),"a") as f:
+                writer = csv.writer(f)
+                writer.writerow(write)
+
+        write=[hydro_value,name]
+        with open(os.path.join(feature_directory,"hydropathy" + ".csv"),"a") as f:
+            writer = csv.writer(f)
+            writer.writerow(write)'''
+    columns=["Happiness_mean","Nr_sad","ID"]
+    with open(os.path.join(feature_directory,"happiness_score" + ".csv"),"w") as f:
+        writer = csv.writer(f)
+        writer.writerow(columns)
+    for filename in os.listdir(actual_directory):
+        nr_sad=0
+        name= filename.replace(".pdb","")
+        command=os.popen("exposedhphob H95 H102 {}".format(os.path.join(actual_directory,filename))).readlines()
+        for i in command:
+            i=i.split()
+            print (i)
+            if "Mean:" in i[0]:
+                mean=i[1]
+                print(mean)
+                continue
+            if "Total:" in i[0]:
+                pass
+            elif float(i[2]) <0.5:
+                nr_sad+=1
+        write=[mean, nr_sad, name]
+        with open(os.path.join(feature_directory,"happiness_score" + ".csv"),"a") as f:
+            writer = csv.writer(f)
+            writer.writerow(write)
+    f.close()
+
+            
+                
 
 
-def surface(feature_directory, input_seq_directory):
-    Accessible_surface_area= {'A': 44.1, 'R': 152.9, "N": 80.8, "D": 76.3, "C": 56.4, "Q": 100.6, "E": 99.2, "G": 0, "H": 98.2, "I": 90.9, "L": 92.8, "K": 139.1, "M": 95.3, "F": 107.4, "P": 79.5,
+
+
+def surface(feature_directory, actual_directory):
+    '''Accessible_surface_area= {'A': 44.1, 'R': 152.9, "N": 80.8, "D": 76.3, "C": 56.4, "Q": 100.6, "E": 99.2, "G": 0, "H": 98.2, "I": 90.9, "L": 92.8, "K": 139.1, "M": 95.3, "F": 107.4, "P": 79.5,
                             "S": 57.5,"T": 73.4, "W": 143.4, "Y": 119.1, "V": 73, "X":89}#89 is rounded average
-    columns=["Surface","Pos","AA","ID"]
-    with open(os.path.join(feature_directory,"accessible_surface_feature" + ".csv"),"w") as f:
+    columns=["Surface","ID"]
+    with open(os.path.join(feature_directory,"accessible_surface" + ".csv"),"w") as f:
         writer = csv.writer(f)
         writer.writerow(columns)
     for filename in os.listdir(input_seq_directory):
@@ -108,7 +144,7 @@ def surface(feature_directory, input_seq_directory):
         surface_values=[]
         with open(os.path.join(input_seq_directory,filename)) as infile:
             copy = False
-            write=[]
+            surface=0
             for line in infile:
                 if "H95" in line:
                     copy = True
@@ -116,20 +152,45 @@ def surface(feature_directory, input_seq_directory):
                     line2=line.split()
                     aminoacid=line2[1]
                     pos=line2[0][1:]
-                    write.append([Accessible_surface_area[aminoacid], pos, aminoacid, name])
+                    surface+=Accessible_surface_area[aminoacid]
                 if "H102" in line:
                     copy = False
-            for i in range (len(write)):
-                first=write[i][0]
-                second=write[i+1][0]
-                third=write[i+2][0]
-                window=np.mean(first,second,third)
-                allAA=(44.1,152.9,80.8,76.3,56.4,100.6,99.2,0,98.2,90.9,92.8,139.1,95.3,57.5,73.4,143.4,119.1,73,89)
-                np.std(allAA)
-
-            with open(os.path.join(feature_directory,"accessible_surface_feature" + ".csv"),"a") as f:
+            write=[surface,name]         
+            with open(os.path.join(feature_directory,"accessible_surface" + ".csv"),"a") as f:
                 writer = csv.writer(f)
-                writer.writerow(write)
+                writer.writerow(write)'''
+    columns=["Access","Relacc","Scacc","Screlacc","ID"]
+    with open(os.path.join(feature_directory,"surface" + ".csv"),"w") as f:
+        writer = csv.writer(f)
+        writer.writerow(columns)
+    for filename in os.listdir(actual_directory):
+        nr_sad=0
+        name= filename.replace(".pdb","")
+        command=os.popen("pdbsolv -r stdout {}".format(os.path.join(actual_directory,filename))).readlines()# RESIDUE  AA   ACCESS  RELACC  SCACC   SCRELACC
+        copy=False
+        results=False
+        for i in command:
+            i=i.split()
+            print(i)
+            if "END" in i:
+                results=True
+                continue
+            if results==True:
+                if "95"== i[2] and "H"==i[1]:
+                    copy = True
+                if copy==True:
+                    access=i[4]
+                    relacc=i[5]
+                    scacc=i[6]
+                    screlacc=i[7]
+                if "102"==i[2] and "H"==i[1]:
+                    copy = False
+        write=[access,relacc,scacc,screlacc, name]
+        with open(os.path.join(feature_directory,"surface" + ".csv"),"a") as f:
+            writer = csv.writer(f)
+            writer.writerow(write)
+    f.close()
+
 
 
 def zscale(feature_directory,input_seq_directory):
@@ -221,7 +282,6 @@ def similarity_score(feature_directory,log_directory):
         name= filename.replace(".log","")
         with open(os.path.join(log_directory,filename)) as infile:
             for line in infile:
-                print(line)
                #INFO: CDR-H3 (YEIR/YEWA) SeqID: 0.500 Similarity: 0.381
                 if "INFO: CDR-H3" in line:
                     output=line.split(" ")
@@ -297,5 +357,7 @@ if __name__=="__main__":
   #get_loop_length(sys.argv[1],sys.argv[2])
   #get_loop_charge(sys.argv[1],sys.argv[2])
   #bulged_non_bulged(sys.argv[1],sys.argv[2], sys.argv[3], sys.argv[4])
-  #merge_csv(sys.argv[1], sys.argv[2],sys.argv[3])
-  similarity_score(sys.argv[1],sys.argv[2])
+  #merge_csv(sys.argv[1], sys.argv[2],sys.argv[3], sys.argv[4])
+  #similarity_score(sys.argv[1],sys.argv[2])
+  happiness_score(sys.argv[1],sys.argv[2])
+  #surface(sys.argv[1],sys.argv[2])

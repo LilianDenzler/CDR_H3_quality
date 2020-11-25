@@ -3,6 +3,7 @@ import sys
 import os
 import numpy as np
 import csv
+import pandas as pd
 #sys.argv[1]=input_seq_directory,
 def loop_redundancy(input_seq_directory):
     list_seq={}
@@ -40,10 +41,30 @@ def loop_redundancy(input_seq_directory):
         list_doubles2.append(a)
     return (list_doubles1, list_doubles2)
 
+def check_empty(to_be_checked_file):
+    file = pd.read_csv(to_be_checked_file)
+    with open(to_be_checked_file, 'r') as csvfile: 
+        reader = csv.reader(csvfile)
+        counter=0
+
+        for row in reader:
+            if all(row[0:file.shape[1]]):
+                pass
+            else:
+                counter+=1
+    csvfile.close()
+
+    print("From ",file.shape[0],"rows, " ,counter," rows will be deleted")
+    file=file.dropna()
+    file.to_csv(to_be_checked_file+".nonan",index=False)
+
+
+
 
 def check_redundancy(to_be_checked_file, input_seq_directory):
     list_doubles1, list_doubles2= loop_redundancy(input_seq_directory)
     lines=[]
+   # print (len(list_doubles1), len(list_doubles2))
     with open(to_be_checked_file, 'r') as csvfile: 
         reader = csv.reader(csvfile)
 
@@ -54,12 +75,13 @@ def check_redundancy(to_be_checked_file, input_seq_directory):
                 if str(i) in line:
                     lines.remove(line)
                     #print("hey")
+        csvfile.close()
 
-    with open('to_be_checked_file.csv', 'w') as writeFile:
-
+    with open(to_be_checked_file, 'w') as writeFile:
         writer = csv.writer(writeFile)
-
         writer.writerows(lines)
+        writeFile.close()
+
 
 
 
@@ -67,6 +89,7 @@ def check_redundancy(to_be_checked_file, input_seq_directory):
 
 if __name__ == '__main__':
     check_redundancy(sys.argv[1], sys.argv[2])
+    check_empty(sys.argv[1])
 
 #just for checking:
 '''for i in doubles.keys():
