@@ -3,6 +3,7 @@ import sys
 import os
 #import numpy as np
 import csv
+import pandas as pd
 
 def extract_seq(feature_directory,input_seq_directory):
     pass
@@ -12,7 +13,7 @@ def write_csv(feature_directory):
 
 def get_loop_length (feature_directory,input_seq_directory):
     columns=["length","ID"]
-    with open(os.path.join(feature_directory,"length_feature_csv" + ".csv"),"w") as f:
+    with open(os.path.join(feature_directory,"length" + ".csv"),"w") as f:
         writer = csv.writer(f)
         writer.writerow(columns)
     for filename in os.listdir(input_seq_directory):
@@ -34,14 +35,14 @@ def get_loop_length (feature_directory,input_seq_directory):
         write=[str(count)]
         write.append(str(name))
         #print(write)
-        with open(os.path.join(feature_directory,"length_feature_csv" + ".csv"),"a") as f:
+        with open(os.path.join(feature_directory,"length" + ".csv"),"a") as f:
             writer = csv.writer(f)
             writer.writerow(write)
 
 def get_loop_charge(feature_directory,input_seq_directory):
     dic = {"D":-1, "K": -1,"R": 1,'E': 1, 'H':1}
-    columns=["charge","ID"]
-    with open(os.path.join(feature_directory,"charge_feature_csv" + ".csv"),"w") as f:
+    columns=["charge","nr_charged","ID"]
+    with open(os.path.join(feature_directory,"charge" + ".csv"),"w") as f:
         writer = csv.writer(f)
         writer.writerow(columns)
     for filename in os.listdir(input_seq_directory):
@@ -50,6 +51,7 @@ def get_loop_charge(feature_directory,input_seq_directory):
             copy = False
             aminoacid=[]
             charge=0
+            nr_charged=0
             for line in infile:
                 if "H95" in line:
                     copy = True
@@ -60,13 +62,13 @@ def get_loop_charge(feature_directory,input_seq_directory):
                     #print ("AA:",aminoacid)
                     if aminoacid in dic:
                         charge+=dic[aminoacid]
+                        nr_charged+=1
                         #print(name, charge, aminoacid, line2[0])
                 if "H102" in line:
                     copy = False
-        write=[str(charge)]
-        write.append(str(name))
+        write=[charge,nr_charged,name]
         #print(write)
-        with open(os.path.join(feature_directory,"charge_feature_csv" + ".csv"),"a") as f:
+        with open(os.path.join(feature_directory,"charge" + ".csv"),"a") as f:
             writer = csv.writer(f)
             writer.writerow(write)
 
@@ -126,13 +128,60 @@ def happiness_score(feature_directory,actual_directory):
             writer.writerow(write)
     f.close()
 
-            
-                
+def hydropathy(feature_directory, input_seq_directory, seq_id_file):
+    '''Consensus values: Eisenberg, et al 'Faraday Symp.Chem.Soc'17(1982)109'''
+    Hydrophathy_index = {'A': 00.250, 'R': -1.800, "N": -0.640, "D": -0.720, "C": 00.040, "Q": -0.690, "E": -0.620, "G": 00.160, "H": -0.400, "I": 00.730, "L": 00.530, "K": -1.100, "M": 00.260, "F": 00.610, "P": -0.070,
+                            "S": -0.260, "T": -0.180, "W": 00.370, "Y": 00.020, "V": 00.540, "X": -0.5}#-0.5 is average
+    columns_seq=["identity", "similarity", "template", "target", "ID"]
+    data = pd.read_csv(sys.argv[3], names=columns_seq)
+    #template=data.template.tolist()
+    #target=data.target.tolist()
+
+
+    columns=["Hydropathy","Hydropathy_diff","ID"]
+    names=[]
+    with open(os.path.join(feature_directory,"hydropathy" + ".csv"),"w") as f:
+        writer = csv.writer(f)
+        writer.writerow(columns)
+    for filename in os.listdir(input_seq_directory):
+        name= filename.replace(".seq","")
+        hydro_value=0
+        with open(os.path.join(input_seq_directory,filename)) as infile:
+            copy = False
+            for line in infile:
+                if "H95" in line:
+                    copy = True
+                if copy==True:
+                    line2=line.split()
+                    aminoacid=line2[1]
+                    pos=line2[0][1:]
+                    hydro_value+=Hydrophathy_index[aminoacid]
+                    row=data.loc[data['ID'] == name]
+                    if row.empty==True:
+                        hydro_diff=None
+                        continue
+                    else:
+                        template=row["template"].values[0]
+                        target=row["target"].values[0]
+                        for a,b in zip(template, target):
+                            hydro_diff=abs(abs(Hydrophathy_index[b])-abs(Hydrophathy_index[a]))
+                if "H102" in line:
+                    copy = False
+            write=[hydro_value,hydro_diff,name]
+            with open(os.path.join(feature_directory,"hydropathy" + ".csv"),"a") as f:
+                writer = csv.writer(f)
+                writer.writerow(write)
+
+        write=[hydro_value,hydro_diff, name]
+        with open(os.path.join(feature_directory,"hydropathy" + ".csv"),"a") as f:
+            writer = csv.writer(f)
+            writer.writerow(write)   
+         
 
 
 
 
-def surface(feature_directory, actual_directory):
+def accessibility(feature_directory, actual_directory):
     '''Accessible_surface_area= {'A': 44.1, 'R': 152.9, "N": 80.8, "D": 76.3, "C": 56.4, "Q": 100.6, "E": 99.2, "G": 0, "H": 98.2, "I": 90.9, "L": 92.8, "K": 139.1, "M": 95.3, "F": 107.4, "P": 79.5,
                             "S": 57.5,"T": 73.4, "W": 143.4, "Y": 119.1, "V": 73, "X":89}#89 is rounded average
     columns=["Surface","ID"]
@@ -159,8 +208,8 @@ def surface(feature_directory, actual_directory):
             with open(os.path.join(feature_directory,"accessible_surface" + ".csv"),"a") as f:
                 writer = csv.writer(f)
                 writer.writerow(write)'''
-    columns=["Access","Relacc","Scacc","Screlacc","ID"]
-    with open(os.path.join(feature_directory,"surface" + ".csv"),"w") as f:
+    columns=["Access","Relacc","Scacc","Screlacc","Access_avg","Relacc_avg","Scacc_avg","Screlacc_avg","ID"]
+    with open(os.path.join(feature_directory,"accessibility" + ".csv"),"w") as f:
         writer = csv.writer(f)
         writer.writerow(columns)
     for filename in os.listdir(actual_directory):
@@ -169,9 +218,14 @@ def surface(feature_directory, actual_directory):
         command=os.popen("pdbsolv -r stdout {}".format(os.path.join(actual_directory,filename))).readlines()# RESIDUE  AA   ACCESS  RELACC  SCACC   SCRELACC
         copy=False
         results=False
+        access=0
+        relacc=0
+        scacc=0
+        screlacc=0
+        counter=0
         for i in command:
             i=i.split()
-            print(i)
+            #print(i)
             if "END" in i:
                 results=True
                 continue
@@ -179,16 +233,37 @@ def surface(feature_directory, actual_directory):
                 if "95"== i[2] and "H"==i[1]:
                     copy = True
                 if copy==True:
-                    access=i[4]
-                    relacc=i[5]
-                    scacc=i[6]
-                    screlacc=i[7]
+                    counter+=1
+                    access+=float(i[4])
+                    relacc+=float(i[5])
+                    scacc+=float(i[6])
+                    screlacc+=float(i[7])
                 if "102"==i[2] and "H"==i[1]:
                     copy = False
-        write=[access,relacc,scacc,screlacc, name]
-        with open(os.path.join(feature_directory,"surface" + ".csv"),"a") as f:
-            writer = csv.writer(f)
-            writer.writerow(write)
+        if counter==0:
+            access_avg=None
+            relacc_avg=None
+            scacc_avg=None
+            screlacc_avg=None
+            access=None
+            relacc=None
+            scacc=None
+            screlacc=None
+            write=[access,relacc,scacc,screlacc, access_avg,relacc_avg, scacc_avg, screlacc_avg, name]
+            with open(os.path.join(feature_directory,"accessibility" + ".csv"),"a") as f:
+                writer = csv.writer(f)
+                writer.writerow(write)
+
+        else:
+            access_avg=access/counter
+            relacc_avg=relacc/counter
+            scacc_avg=scacc/counter
+            screlacc_avg=screlacc/counter
+
+            write=[access,relacc,scacc,screlacc, access_avg,relacc_avg, scacc_avg, screlacc_avg, name]
+            with open(os.path.join(feature_directory,"accessibility" + ".csv"),"a") as f:
+                writer = csv.writer(f)
+                writer.writerow(write)
     f.close()
 
 
@@ -342,15 +417,28 @@ Hydrophobic (normally buried inside the protein core):
 • Glycine - Gly - G
 '''
 
-def merge_csv(filea, fileb, new_name, feature_directory):
-    import pandas as pd
+def merge_csv(new_name, feature_directory):
+    '''
     a = pd.read_csv(filea, header=0,sep=',')
     print(a)
     b = pd.read_csv(fileb, header=0,sep=',')
     print(b)
     #b = b.dropna(axis=1)
     merged = a.merge(b, on='ID')
-    merged.to_csv(os.path.join(feature_directory,new_name+".csv"), index=False)
+    merged.to_csv(os.path.join(feature_directory,new_name+".csv"), index=False)'''
+    file_list=[]
+    for file in os.listdir(feature_directory):
+        file_list.append(os.path.join(feature_directory,file))
+    print(file_list)
+    a = pd.read_csv(file_list[0], header=0,sep=',')
+    for i in range (1,len(file_list)):
+        bla=file_list[i]
+        print(bla)
+        b= pd.read_csv(str(bla), header=0,sep=',')
+        merged = a.merge(b, on='ID')
+        a=merged
+    a.to_csv(os.path.join(feature_directory,new_name+".csv"), index=False)
+
 #python3 feature_extraction.py ~/sync_project/Feature/ ~/sync_project/input_Abymod_seq/
 
 if __name__=="__main__":
@@ -359,5 +447,10 @@ if __name__=="__main__":
   #bulged_non_bulged(sys.argv[1],sys.argv[2], sys.argv[3], sys.argv[4])
   #merge_csv(sys.argv[1], sys.argv[2],sys.argv[3], sys.argv[4])
   #similarity_score(sys.argv[1],sys.argv[2])
-  happiness_score(sys.argv[1],sys.argv[2])
-  #surface(sys.argv[1],sys.argv[2])
+  #happiness_score(sys.argv[1],sys.argv[2])
+  #hydropathy(sys.argv[1],sys.argv[2], sys.argv[3])
+  #accessibility(sys.argv[1],sys.argv[2])
+  feature_directory=sys.argv[1]
+  new_name="all_combined_preliminary"
+  merge_csv(new_name, feature_directory)
+  
