@@ -15,11 +15,7 @@ import seaborn as sns
 #GRAPH: Sequence Similarity/Identity vs RMSD
 #DO FITTING!!!!!!!!!!!!!!!!
 #################################################################
-columns=["Access", "Relacc", "Scacc", "Screlacc", "Access_avg", "Relacc_avg", "Scacc_avg", "Screlacc_avg","ID"]
-data1 = pd.read_csv(sys.argv[1], names=columns)
-columns2=["local_AA", "local_CA", "global_AA", "global_CA", "ID"]
-data2 = pd.read_csv(sys.argv[2], names=columns2)
-data=data1.merge(data2, on="ID")
+data = pd.read_csv(sys.argv[1], header=0)
 access=data.Access.tolist()
 relacc=data.Relacc.tolist()
 scacc=data.Scacc.tolist()

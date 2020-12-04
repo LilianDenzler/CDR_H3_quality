@@ -65,13 +65,13 @@ def check_redundancy(to_be_checked_file, input_seq_directory):
     list_doubles1, list_doubles2= loop_redundancy(input_seq_directory)
     lines=[]
     print(to_be_checked_file)
-    data = pd.read_csv(str(to_be_checked_file),error_bad_lines=False)
+    data = pd.read_csv(to_be_checked_file, error_bad_lines=False, header=0)
     x=data.target.tolist()
     for i in x:
         lines.append(i)
     for line in lines:
         for i in list_doubles1:
-            if str(i) in line:
+            if str(i) in line:                                            
                 print (line)
                 print(str(i))
                 lines.remove(line)

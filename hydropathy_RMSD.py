@@ -14,11 +14,7 @@ import seaborn as sns
 #GRAPH: Ca-RMSD vs Hydrophobicity
 #DO FITTING!!!!!!!!!!!!!!!!
 #################################################################
-columns=["Hydropathy","Hydropathy_diff","ID"]
-data1 = pd.read_csv(sys.argv[1], names=columns)
-columns2=["local_AA", "local_CA", "global_AA", "global_CA", "ID"]
-data2 = pd.read_csv(sys.argv[2], names=columns2)
-data=data1.merge(data2, on="ID")
+data = pd.read_csv(sys.argv[1], header=0)
 x=data.Hydropathy.tolist()
 y=data.local_CA.tolist()
 

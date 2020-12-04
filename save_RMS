@@ -26,6 +26,8 @@ def pass_Profit_commands (script_name, actual_directory, model_directory, featur
         else:
             command=os.popen("./profit -f {} -h {} {}".format(script_name, os.path.join(actual_directory,name+".pdb"), os.path.join(model_directory,name+".pdb"+".model"))).readlines()
             #RMS=open(os.path.join(model_directory,"ProFit_results",filename + ".profit"),'w+')
+            if not os.path.exists(os.path.join(feature_directory,"ProFit_results",filename+ ".profit_by_res")):
+                os.makedirs(os.path.join(feature_directory,"ProFit_results",filename+ ".profit_by_res"))
             By_res=open(os.path.join(feature_directory,"ProFit_results",filename+ ".profit_by_res"),'w+')
 
             counter=0
