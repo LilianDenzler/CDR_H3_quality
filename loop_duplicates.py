@@ -42,13 +42,15 @@ def loop_redundancy(input_seq_directory):
     return (list_doubles1, list_doubles2)
 
 def check_empty(to_be_checked_file):
-    file = pd.read_csv(str(to_be_checked_file), error_bad_lines=False)
-    with open(to_be_checked_file,+'.nonan', 'r') as csvfile: 
+    file = pd.read_csv(to_be_checked_file)
+    with open(to_be_checked_file,'r') as csvfile: 
         reader = csv.reader(csvfile)
         counter=0
 
         for row in reader:
-            if all(row[0:file.shape[1]]):
+            if all(row[0:file.shape[1]]) and len(row)==file.shape[1]:
+                print(row)
+                print(file.shape[1])
                 pass
             else:
                 counter+=1
@@ -88,7 +90,7 @@ def check_redundancy(to_be_checked_file, input_seq_directory):
 
 
 if __name__ == '__main__':
-    check_redundancy(sys.argv[1], sys.argv[2])
+    #check_redundancy(sys.argv[1], sys.argv[2])
     check_empty(sys.argv[1])
 
 #just for checking:

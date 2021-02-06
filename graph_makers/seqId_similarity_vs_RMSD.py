@@ -11,40 +11,70 @@ from scipy.optimize import curve_fit
 from scipy import optimize
 import seaborn as sns
 from itertools import chain
-
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report, confusion_matrix
 #################################################################
 #GRAPH: Sequence Similarity/Identity vs RMSD
 #DO FITTING!!!!!!!!!!!!!!!!
 #################################################################
-columns=["local_AA","local_CA","global_AA","global_CA","ID", "length", "identity", "similarity", "template", "target"]
-data = pd.read_csv(sys.argv[1], names=columns)
+data = pd.read_csv(sys.argv[1])
 x=data.identity.tolist()
-y=data.similarity.tolist()
+y=data.simlength.tolist()
 a=data.local_CA.tolist()
+length=data.length.tolist()
+length=[int(x) for x in length]
 
-del x[0]
-del y[0]
-del a[0]
+scaler = MinMaxScaler() 
+column_names_to_normalize = ['simlength']
+x = data[column_names_to_normalize].values
+x_scaled = scaler.fit_transform(x)
+data_temp = pd.DataFrame(x_scaled, columns=column_names_to_normalize, index = data.index)
+data[column_names_to_normalize] = data_temp
 
-x = [g for g in x if str(g) != 'nan']
-x = [float(g) for g in x]
-y = [g for g in y if str(g) != 'nan']
-y = [float(g) for g in y]
-a = [g for g in a if str(g) != 'nan']
-a = [float(g) for g in a]
-print(len(x),len(a))
-r1=stats.pearsonr(x, a) #	(Pearson’s correlation coefficient, 2-tailed p-value)
-r2=stats.pearsonr(y,a)
+data = data[data["simlength"].between(0.3, 100)] #get rid of the two outliers
+data['local_CA_log'] = np.log10(data['local_CA'])
 
-print(r1, r2)
+
 df1 = pd.DataFrame(list(zip(x, a)), columns =['sequence identity', 'RMSD Local CA (Å)']) 
 df2 = pd.DataFrame(list(zip(y, a)), columns =['sequence similarity', 'RMSD Local CA (Å)']) 
-sns.jointplot(data=df1, x="sequence identity", y="RMSD Local CA (Å)", kind='reg',stat_func=stats.pearsonr,joint_kws={'line_kws':{'color':'black'}})
+sns.jointplot(data=data, x="identity", y="local_CA", kind='reg',stat_func=stats.pearsonr,joint_kws={'line_kws':{'color':'black'}},scatter_kws={'alpha':0.0})
+ax=sns.scatterplot(data=data, x="identity", y="local_CA",hue="length", palette='viridis',alpha=0.5, s=50)
+sm = plt.cm.ScalarMappable(cmap="viridis")
+sm.set_array([])
 plt.xlim([-0.05,1.01])
 plt.ylim([-0.1,8.5])
-sns.jointplot(data=df2, x="sequence similarity", y="RMSD Local CA (Å)", kind='reg',stat_func=stats.pearsonr,joint_kws={'line_kws':{'color':'black'}})
-plt.xlim([-0.6,1.01])
+ax.get_legend().remove()
+ticks=[0,2,4,6,8,10, 12,14,16,18,20,22,24,26,28]
+nticks=[((x - min(length)) / (max(length) - min(length))) for x in ticks]
+ticks=[str(x) for x in ticks]
+#cbar=ax.figure.colorbar(sm, ticks=nticks, orientation='horizontal')
+#cbar.ax.set_xticklabels(ticks) 
+plt.savefig("identity_color.png")
+
+sns.jointplot(data=data, x="simlength", y="local_CA_log", kind='reg',stat_func=stats.pearsonr,joint_kws={'line_kws':{'color':'black'}},scatter_kws={'alpha':0.0})
+ax=sns.scatterplot(data=data, x="simlength", y="local_CA_log",hue="length", palette='viridis',alpha=0.5, s=50)
+sm = plt.cm.ScalarMappable(cmap="viridis")
+sm.set_array([])
+#plt.xlim([-0.1,0.3])
+#plt.ylim([0,8.5])
+ax.get_legend().remove()
+ticks=[0,2,4,6,8,10, 12,14,16,18,20,22,24,26,28]
+nticks=[((x - min(length)) / (max(length) - min(length))) for x in ticks]
+ticks=[str(x) for x in ticks]
+#cbar=ax.figure.colorbar(sm, ticks=nticks)
+#cbar.ax.set_yticklabels(ticks) 
+plt.savefig("similarity_length_color.png")
+
+sns.jointplot(data=data, x="identity", y="local_CA", kind='reg',stat_func=stats.pearsonr,joint_kws={'line_kws':{'color':'black'}})
+plt.xlim([-0.05,1.01])
 plt.ylim([-0.1,8.5])
+plt.savefig("identity.png") 
+
+sns.jointplot(data=data, x="simlength", y="local_CA_log", kind='reg',stat_func=stats.pearsonr,joint_kws={'line_kws':{'color':'black'}})
+#plt.xlim([-0.6,1.01])
+#plt.ylim([0,8.5])
+plt.savefig("similarity_length.png") 
 
 plt.show()
-#plt.savefig("seqId_similarity_RMSD.png") 

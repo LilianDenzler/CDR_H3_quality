@@ -253,9 +253,7 @@ fig.savefig("surface_RMSD.png") '''
 #GRAPH: Ca-RMSD vs charge
 #DO FITTING!!!!!!!!!!!!!!!!
 #################################################################
-
-columns=["charge", "ID", "Surface", "Hydropathy", "local_AA","local_CA","global_AA","global_CA"]
-data = pandas.read_csv(sys.argv[1], names=columns)
+data = pandas.read_csv(sys.argv[1])
 x=data.charge.tolist()
 y=data.global_AA.tolist()
 

@@ -25,66 +25,143 @@ relacc_avg=data.Relacc_avg.tolist()
 scacc_avg=data.Scacc_avg.tolist()
 screlacc_avg=data.Screlacc_avg.tolist()
 x=data.local_CA.tolist()
+length=data.length.tolist()
+length=[int(x) for x in length]
 
-del access[0]
-del relacc[0]
-del scacc[0]
-del screlacc[0]
-del access_avg[0]
-del relacc_avg[0]
-del scacc_avg[0]
-del screlacc_avg[0]
-del x[0]
-access=[float(i) for i in access]
-relacc=[float(i) for i in relacc]
-scacc=[float(i) for i in scacc]
-screlacc=[float(i) for i in screlacc]
-access_avg=[float(i) for i in access_avg]
-relacc_avg=[float(i) for i in relacc_avg]
-scacc_avg=[float(i) for i in scacc_avg]
-screlacc_avg=[float(i) for i in screlacc_avg]
-x=[float(i) for i in x]
-
-
-df1 = pd.DataFrame(list(zip(x, access)), columns =['RMSD Local CA (Å)', 'accessibility']) 
-df2 = pd.DataFrame(list(zip(x, relacc)), columns =['RMSD Local CA (Å)', "relative accessibility"]) 
-df3 = pd.DataFrame(list(zip(x, scacc)), columns =['RMSD Local CA (Å)', 'side-chain accessibility']) 
-df4 = pd.DataFrame(list(zip(x, screlacc)), columns =['RMSD Local CA (Å)', "relative side-chain accessibility"]) 
-df5 = pd.DataFrame(list(zip(x, access_avg)), columns =['RMSD Local CA (Å)', 'average accessibility']) 
-df6 = pd.DataFrame(list(zip(x, relacc_avg)), columns =['RMSD Local CA (Å)', "average relative accessibility"]) 
-df7 = pd.DataFrame(list(zip(x, scacc_avg)), columns =['RMSD Local CA (Å)', 'average side-chain accessibility']) 
-df8 = pd.DataFrame(list(zip(x, screlacc_avg)), columns =['RMSD Local CA (Å)', "average relative side-chain accessibility"]) 
-sns.jointplot(data=df1, x='accessibility', y='RMSD Local CA (Å)', kind='reg',stat_func=stats.pearsonr, joint_kws={'line_kws':{'color':'black'}})
+#sns.set()
+sns.jointplot(data=data, x='Access_avg', y='local_CA', color=None,kind='reg',stat_func=stats.pearsonr, joint_kws={'line_kws':{'color':'black'}},scatter_kws={'alpha':0.0})
+ax=sns.scatterplot(data=data, x='Access_avg', y='local_CA',hue="length", palette='viridis',alpha=0.5, s=50)
+sm = plt.cm.ScalarMappable(cmap="viridis")
+sm.set_array([])
 plt.ylim([0,9])
-plt.xlim([0,2200])
+plt.xlim([0,100])
+ax.get_legend().remove()
+#ax.figure.colorbar(sm)
+plt.savefig("surface_Acc_avg.png")
+
+sns.jointplot(data=data, x='Relacc_avg', y='local_CA', color=None,kind='reg',stat_func=stats.pearsonr, joint_kws={'line_kws':{'color':'black'}},scatter_kws={'alpha':0.0})
+ax=sns.scatterplot(data=data, x='Relacc_avg', y='local_CA',hue="length", palette='viridis',alpha=0.5, s=50)
+sm = plt.cm.ScalarMappable(cmap="viridis")
+sm.set_array([])
+plt.ylim([0,9])
+plt.xlim([0,80])
+ax.get_legend().remove()
+ticks=[0,2,4,6,8,10, 12,14,16,18,20,22,24,26,28]
+nticks=[((x - min(length)) / (max(length) - min(length))) for x in ticks]
+ticks=[str(x) for x in ticks]
+#cbar=ax.figure.colorbar(sm, ticks=nticks, orientation='horizontal')
+#cbar.ax.set_xticklabels(ticks) 
+plt.savefig("surface_Relacc_avg.png")
+
+sns.jointplot(data=data, x='Scacc_avg', y='local_CA', color=None,kind='reg',stat_func=stats.pearsonr, joint_kws={'line_kws':{'color':'black'}},scatter_kws={'alpha':0.0})
+ax=sns.scatterplot(data=data, x='Scacc_avg', y='local_CA',hue="length", palette='viridis',alpha=0.5, s=50)
+sm = plt.cm.ScalarMappable(cmap="viridis")
+sm.set_array([])
+plt.ylim([0,9])
+plt.xlim([0,80])
+ax.get_legend().remove()
+ticks=[0,2,4,6,8,10, 12,14,16,18,20,22,24,26,28]
+nticks=[((x - min(length)) / (max(length) - min(length))) for x in ticks]
+ticks=[str(x) for x in ticks]
+#cbar=ax.figure.colorbar(sm, ticks=nticks, orientation='horizontal')
+#cbar.ax.set_xticklabels(ticks) 
+plt.savefig("surface_Scacc_avg.png")
+
+sns.jointplot(data=data, x='Screlacc_avg', y='local_CA', color=None,kind='reg',stat_func=stats.pearsonr, joint_kws={'line_kws':{'color':'black'}},scatter_kws={'alpha':0.0})
+ax=sns.scatterplot(data=data, x='Screlacc_avg', y='local_CA',hue="length", palette='viridis',alpha=0.5, s=50)
+sm = plt.cm.ScalarMappable(cmap="viridis")
+sm.set_array([])
+plt.ylim([0,9])
+plt.xlim([0,65])
+ax.get_legend().remove()
+#ax.figure.colorbar(sm)
+plt.savefig("surface_Screlacc_avg.png")
+
+sns.jointplot(data=data, x='Access', y='local_CA', color=None,kind='reg',stat_func=stats.pearsonr, joint_kws={'line_kws':{'color':'black'}},scatter_kws={'alpha':0.0})
+ax=sns.scatterplot(data=data, x='Access', y='local_CA',hue="length", palette='viridis',alpha=0.5, s=50)
+sm = plt.cm.ScalarMappable(cmap="viridis")
+sm.set_array([])
+plt.ylim([0,9])
+plt.xlim([0,1200])
+ax.get_legend().remove()
+#ax.figure.colorbar(sm)
+plt.savefig("surface_Acc.png")
+
+sns.jointplot(data=data, x='Relacc', y='local_CA', color=None,kind='reg',stat_func=stats.pearsonr, joint_kws={'line_kws':{'color':'black'}},scatter_kws={'alpha':0.0})
+ax=sns.scatterplot(data=data, x='Relacc', y='local_CA',hue="length", palette='viridis',alpha=0.5, s=50)
+sm = plt.cm.ScalarMappable(cmap="viridis")
+sm.set_array([])
+plt.ylim([0,9])
+plt.xlim([0,1200])
+ax.get_legend().remove()
+ticks=[0,2,4,6,8,10, 12,14,16,18,20,22,24,26,28]
+nticks=[((x - min(length)) / (max(length) - min(length))) for x in ticks]
+ticks=[str(x) for x in ticks]
+#cbar=ax.figure.colorbar(sm, ticks=nticks, orientation='horizontal')
+#cbar.ax.set_xticklabels(ticks) 
+plt.savefig("surface_Relacc.png")
+
+sns.jointplot(data=data, x='Scacc', y='local_CA', color=None,kind='reg',stat_func=stats.pearsonr, joint_kws={'line_kws':{'color':'black'}},scatter_kws={'alpha':0.0})
+ax=sns.scatterplot(data=data, x='Scacc', y='local_CA',hue="length", palette='viridis',alpha=0.5, s=50)
+sm = plt.cm.ScalarMappable(cmap="viridis")
+sm.set_array([])
+plt.ylim([0,9])
+plt.xlim([0,1800])
+ax.get_legend().remove()
+ticks=[0,2,4,6,8,10, 12,14,16,18,20,22,24,26,28]
+nticks=[((x - min(length)) / (max(length) - min(length))) for x in ticks]
+ticks=[str(x) for x in ticks]
+#cbar=ax.figure.colorbar(sm, ticks=nticks, orientation='horizontal')
+#cbar.ax.set_xticklabels(ticks) 
+plt.savefig("surface_Scacc.png")
+
+sns.jointplot(data=data, x='Screlacc', y='local_CA', color=None,kind='reg',stat_func=stats.pearsonr, joint_kws={'line_kws':{'color':'black'}},scatter_kws={'alpha':0.0})
+ax=sns.scatterplot(data=data, x='Screlacc', y='local_CA',hue="length", palette='viridis',alpha=0.5, s=50)
+sm = plt.cm.ScalarMappable(cmap="viridis")
+sm.set_array([])
+plt.ylim([0,9])
+plt.xlim([0,1500])
+ax.get_legend().remove()
+#ax.figure.colorbar(sm)
+plt.savefig("surface_Screlacc.png")
+
+
+'''
+
+
+
+sns.jointplot(data=data, x="Access", y="local_CA", kind='reg',stat_func=stats.pearsonr,joint_kws={'line_kws':{'color':'black'}})
+plt.ylim([0,9])
+plt.xlim([0,1200])
 plt.savefig("surface_RMSD1.png")
-sns.jointplot(data=df2, x="relative accessibility", y="RMSD Local CA (Å)", kind='reg',stat_func=stats.pearsonr,joint_kws={'line_kws':{'color':'black'}})
+
+sns.jointplot(data=data, x="Relacc", y="local_CA", kind='reg',stat_func=stats.pearsonr,joint_kws={'line_kws':{'color':'black'}})
 plt.ylim([0,9])
 plt.xlim([0,1200])
 plt.savefig("surface_RMSD2.png")
-sns.jointplot(data=df3, x="side-chain accessibility", y="RMSD Local CA (Å)", kind='reg',stat_func=stats.pearsonr,joint_kws={'line_kws':{'color':'black'}})
+sns.jointplot(data=data, x="Scacc", y="local_CA", kind='reg',stat_func=stats.pearsonr,joint_kws={'line_kws':{'color':'black'}})
 plt.ylim([0,9])
 plt.xlim([0,1800])
 plt.savefig("surface_RMSD3.png")
-sns.jointplot(data=df4, x="relative side-chain accessibility", y="RMSD Local CA (Å)", kind='reg',stat_func=stats.pearsonr,joint_kws={'line_kws':{'color':'black'}})
+sns.jointplot(data=data, x="Screlacc", y="local_CA", kind='reg',stat_func=stats.pearsonr,joint_kws={'line_kws':{'color':'black'}})
 plt.ylim([0,9])
 plt.xlim([0,1500])
 plt.savefig("surface_RMSD4.png")
 
-sns.jointplot(data=df5, x='average accessibility', y='RMSD Local CA (Å)', kind='reg',stat_func=stats.pearsonr, joint_kws={'line_kws':{'color':'black'}})
+sns.jointplot(data=data, x='Access_avg', y='local_CA', kind='reg',stat_func=stats.pearsonr, joint_kws={'line_kws':{'color':'black'}})
 plt.ylim([0,9])
 plt.xlim([0,120])
 plt.savefig("surface_RMSD1_avg.png")
-sns.jointplot(data=df6, x="average relative accessibility", y="RMSD Local CA (Å)", kind='reg',stat_func=stats.pearsonr,joint_kws={'line_kws':{'color':'black'}})
+sns.jointplot(data=data, x="Relacc_avg", y="local_CA", kind='reg',stat_func=stats.pearsonr,joint_kws={'line_kws':{'color':'black'}})
 plt.ylim([0,9])
 plt.xlim([0,80])
 plt.savefig("surface_RMSD2_avg.png")
-sns.jointplot(data=df7, x="average side-chain accessibility", y="RMSD Local CA (Å)", kind='reg',stat_func=stats.pearsonr,joint_kws={'line_kws':{'color':'black'}})
+sns.jointplot(data=data, x="Scacc_avg", y="local_CA", kind='reg',stat_func=stats.pearsonr,joint_kws={'line_kws':{'color':'black'}})
 plt.ylim([0,9])
 plt.xlim([0,80])
 plt.savefig("surface_RMSD3_avg.png")
-sns.jointplot(data=df8, x="average relative side-chain accessibility", y="RMSD Local CA (Å)", kind='reg',stat_func=stats.pearsonr,joint_kws={'line_kws':{'color':'black'}})
+sns.jointplot(data=data, x="Screlacc_avg", y="local_CA", kind='reg',stat_func=stats.pearsonr,joint_kws={'line_kws':{'color':'black'}})
 plt.ylim([0,9])
 plt.xlim([0,65])
 plt.savefig("surface_RMSD4_avg.png")
-plt.show()
+plt.show()'''

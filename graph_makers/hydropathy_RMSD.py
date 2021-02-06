@@ -14,11 +14,7 @@ import seaborn as sns
 #GRAPH: Ca-RMSD vs Hydrophobicity
 #DO FITTING!!!!!!!!!!!!!!!!
 #################################################################
-columns=["Hydropathy","ID"]
-data1 = pd.read_csv(sys.argv[1], names=columns)
-columns2=["local_AA", "local_CA", "global_AA", "global_CA", "ID"]
-data2 = pd.read_csv(sys.argv[2], names=columns2)
-data=data1.merge(data2, on="ID")
+data = pd.read_csv(sys.argv[1])
 x=data.Hydropathy.tolist()
 y=data.local_CA.tolist()
 
@@ -52,3 +48,24 @@ plt.title("Hydrophobicity vs RMSD", fontsize=14, fontweight='bold')
 plt.ylim([0,9])
 plt.show()
 fig.savefig("Hydrophobicity_RMSD.png") 
+
+
+data = pd.read_csv(sys.argv[1])
+x=data.Hydropathy_diff.tolist()
+y=data.local_CA.tolist()
+
+
+del x[0]
+del y[0]
+x = [float(k) for k in x]
+y = [float(k) for k in y]
+print(type(x[1]))
+print(type(y[1]))
+fig = plt.figure()
+r1=stats.pearsonr(x, y) #	(Pearson’s correlation coefficient, 2-tailed p-value)
+sns.regplot(x=x,y=y)
+plt.title("Hydrophobicity Difference vs RMSD", fontsize=14, fontweight='bold')
+plt.xlabel('Hydrophobicity Difference')
+plt.ylabel('RMSD Local CA (Å)')
+plt.show()
+fig.savefig("Hydrophobicity_diff_RMSD.png") 

@@ -6,8 +6,7 @@ import pandas
 import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
-columns=["local_AA","local_CA","global_AA","global_CA","ID"]
-data = pandas.read_csv(sys.argv[1], names=columns)
+data = pandas.read_csv(sys.argv[1])
 x=data.local_AA.tolist()
 y=data.global_AA.tolist()
 a=data.local_CA.tolist()
