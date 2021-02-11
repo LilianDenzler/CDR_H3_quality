@@ -1,0 +1,60 @@
+
+#total quality excluding loop (use as feature later), doesnt work with DELZONE
+#do additive zones
+#res to file
+
+#local atom-atom
+ZONE H95-H102
+IGNOREMISSING
+FIT
+
+#local atom-atom by residue
+RESIDUE
+ZONE CLEAR
+
+
+
+#local Ca-Ca
+ATOMS CA
+ZONE H95-H102
+FIT
+
+#local Ca-Ca by residue
+RESIDUE
+ZONE CLEAR
+ATOMS *
+
+
+
+#global atom-atom # Kabat (and chothia ->CDRH1 combined)
+ZONE H2-H5
+ZONE H7-H25
+ZONE H36-H49
+ZONE H66-H94
+ZONE H103-H112 # H2-H94, H103-H112
+FIT
+RZONE H95-H102
+
+
+#global atom-atom by residue
+
+RESIDUE
+RZONE CLEAR
+ZONE CLEAR
+
+
+
+
+#global Ca-Ca
+ATOMS CA
+ZONE H2-H5
+ZONE H7-H25
+ZONE H36-H49
+ZONE H66-H94
+FIT
+RZONE H95-H102
+
+#global Ca-Ca by residue
+RESIDUE
+RZONE CLEAR
+ZONE CLEAR

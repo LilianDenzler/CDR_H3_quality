@@ -1,0 +1,16 @@
+README.md
+setup.py
+qualiloop/__init__.py
+qualiloop/accessibility_lib.py
+qualiloop/charge_lib.py
+qualiloop/get_abYmod2_lib.py
+qualiloop/happiness_lib.py
+qualiloop/myfunctions.py
+qualiloop/save_RMS_lib.py
+qualiloop/seq_parser_lib.py
+qualiloop.egg-info/PKG-INFO
+qualiloop.egg-info/SOURCES.txt
+qualiloop.egg-info/dependency_links.txt
+qualiloop.egg-info/top_level.txt
+tests/__init__.py
+tests/test_myfunctions.py
