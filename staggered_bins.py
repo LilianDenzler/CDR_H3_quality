@@ -110,7 +110,7 @@ def RMSD_nom(RMSD_df,second_layer_list_up,second_layer_list_down):
 	#print(dfnew)
 	return (dfnew)
 
-def make_bin_df(RMSD_file, feature_csv, bin_models,staggering_value,max_angstrom,first_layer_size,second_layer_size,accuracy_csv_path):
+def make_bin_df(RMSD_file, feature_csv, bin_models,staggering_value,max_angstrom,first_layer_size,second_layer_size,accuracy_csv_path, features_to_include):
 	#here the staggering is set
 	#total range: 0-5 i.e above 5Angstrom there is no more differentiation
 	#first_layer bins are 1 Angstrom in size, second layer bins are 2Angstroms in size
@@ -150,7 +150,7 @@ def make_bin_df(RMSD_file, feature_csv, bin_models,staggering_value,max_angstrom
 		prediction_df=df2.merge(feature_df, on="ID")
 		print(prediction_df)
 		print(prediction_df.columns)
-		prediction_df2=parse_prediction_df(prediction_df,up, bin_models)
+		prediction_df2=parse_prediction_df(prediction_df,up, bin_models, features_to_include)
 		vals,bin_vals= Kfolds(prediction_df2,up, bin_models)
 		mean_accuracy= model(vals, bin_vals, bin_models, up)
 		accuracy_bins.update({up:[mean_accuracy]})
@@ -159,17 +159,9 @@ def make_bin_df(RMSD_file, feature_csv, bin_models,staggering_value,max_angstrom
 	return df
 	
 
-def parse_prediction_df(prediction_df, up, bin_models):
-	features_to_include=["local_CA_bin"+str(up),'LLE1', 'LLE2', 'LLE3', 'LLE4', 'LLE5', 'LLE6', 'LTSA1',
-       'LTSA2', 'LTSA3', 'LTSA4', 'LTSA5', 'LTSA6', 'Mod_LLE1', 'Mod_LLE2',
-       'Mod_LLE3', 'Mod_LLE4', 'Mod_LLE5', 'Mod_LLE6', 'Isomap1', 'Isomap2',
-       'Isomap3', 'Isomap4', 'Isomap5', 'Isomap6', 'MDS1', 'MDS2', 'MDS3',
-       'MDS4', 'MDS5', 'MDS6', 'SE1', 'SE2', 'SE3', 'SE4', 'SE5', 'SE6',
-       'tSNE1', 'tSNE2', 'tSNE3', 'tSNE4', 'tSNE5', 'tSNE6', 'blosum62_val1',
-       'blosum62_val2', 'blosum62_val3', 'blosum62_val4', 'blosum62_val5',
-       'blosum62_val6', 'tip_pos', 'protrusion', 'length', 'total_charge', 'nr_charged', 'Happiness_mean',
-       'Nr_sad', 'identity', 'similarity','Hydropathy',
-       'Hydropathy_diff', 'Access', 'Relacc', 'Scacc', 'Screlacc','simlength'] #deleted tip_res
+def parse_prediction_df(prediction_df, up, bin_models, features_to_include):
+	print("HERE",features_to_include)
+	features_to_include=[("local_CA_bin"+str(up))]+features_to_include
 	prediction_df.isnull().any()
 
 	prediction_df2 = prediction_df.copy()
@@ -287,17 +279,7 @@ def MCC_weighting(accuracy_bins,second_layer_list_up, predicted_vals, first_laye
 	return new_dic
 
 
-def make_test_df(bin_models, test_file,second_layer_size, max_angstrom,first_layer_size,staggering_value): #accuracy_csv_path
-	features_to_include=['LLE1', 'LLE2', 'LLE3', 'LLE4', 'LLE5', 'LLE6', 'LTSA1',
-       'LTSA2', 'LTSA3', 'LTSA4', 'LTSA5', 'LTSA6', 'Mod_LLE1', 'Mod_LLE2',
-       'Mod_LLE3', 'Mod_LLE4', 'Mod_LLE5', 'Mod_LLE6', 'Isomap1', 'Isomap2',
-       'Isomap3', 'Isomap4', 'Isomap5', 'Isomap6', 'MDS1', 'MDS2', 'MDS3',
-       'MDS4', 'MDS5', 'MDS6', 'SE1', 'SE2', 'SE3', 'SE4', 'SE5', 'SE6',
-       'tSNE1', 'tSNE2', 'tSNE3', 'tSNE4', 'tSNE5', 'tSNE6', 'blosum62_val1',
-       'blosum62_val2', 'blosum62_val3', 'blosum62_val4', 'blosum62_val5',
-       'blosum62_val6', 'tip_pos', 'protrusion', 'length', 'total_charge', 'nr_charged', 'Happiness_mean',
-       'Nr_sad', 'identity', 'similarity','Hydropathy',
-       'Hydropathy_diff', 'Access', 'Relacc', 'Scacc', 'Screlacc','simlength'] #deleted tip_res
+def make_test_df(bin_models, test_file,second_layer_size, max_angstrom,first_layer_size,staggering_value, features_to_include): #accuracy_csv_path
 	test_df=pd.read_csv(test_file)
 	test_df.isnull().any()
 	#accuracy_bins=pd.read_csv(accuracy_csv_path, header=0)
@@ -354,18 +336,8 @@ def run_with_unknown(unknown_file, third_model_path) :
 	staggering_value=0.2
 	max_angstrom=5
 	first_layer_size=1
-	second_layer_size=1
-	features_to_include=['LLE1', 'LLE2', 'LLE3', 'LLE4', 'LLE5', 'LLE6', 'LTSA1',
-       'LTSA2', 'LTSA3', 'LTSA4', 'LTSA5', 'LTSA6', 'Mod_LLE1', 'Mod_LLE2',
-       'Mod_LLE3', 'Mod_LLE4', 'Mod_LLE5', 'Mod_LLE6', 'Isomap1', 'Isomap2',
-       'Isomap3', 'Isomap4', 'Isomap5', 'Isomap6', 'MDS1', 'MDS2', 'MDS3',
-       'MDS4', 'MDS5', 'MDS6', 'SE1', 'SE2', 'SE3', 'SE4', 'SE5', 'SE6',
-       'tSNE1', 'tSNE2', 'tSNE3', 'tSNE4', 'tSNE5', 'tSNE6', 'blosum62_val1',
-       'blosum62_val2', 'blosum62_val3', 'blosum62_val4', 'blosum62_val5',
-       'blosum62_val6', 'ID', 'tip_pos', 'protrusion', 'length', 'total_charge', 'nr_charged', 'Happiness_mean',
-       'Nr_sad', 'identity', 'similarity', 'Hydropathy',
-       'Hydropathy_diff', 'Access', 'Relacc', 'Scacc', 'Screlacc',
-       'local_CA','simlength'] #deleted tip_res
+	second_layer_size=2
+	features_to_include=['tip_pos', 'protrusion', 'length', 'total_charge', 'nr_charged', 'identity', 'similarity','Hydropathy','Hydropathy_diff'] #deleted tip_res
 	second_layer_list_down=np.arange(0,max_angstrom,second_layer_size) # makes 0,1,2,...4
 	second_layer_list_up=np.arange(second_layer_size,max_angstrom,second_layer_size) # makes 1,2,...4
 	second_layer_list_up=np.append(second_layer_list_up,max_angstrom)
@@ -373,7 +345,7 @@ def run_with_unknown(unknown_file, third_model_path) :
 	#first we take our csv with all our features and remove all unwanted features (and calculate local_CA_nom class if you want for testing)
 
 	#we then feed into first layer and calculate the prediction values for each categories from second layer back into feature csv
-	prediction_df=make_test_df(bin_models, unknown_file, second_layer_size,max_angstrom,first_layer_size,staggering_value)
+	prediction_df=make_test_df(bin_models, unknown_file, second_layer_size,max_angstrom,first_layer_size,staggering_value, features_to_include)
 	unknown_file=pd.read_csv(unknown_file,header=0)
 	df_nom=RMSD_nom(unknown_file,second_layer_list_up,second_layer_list_down)
 	df_nom=df_nom[["local_CA_nom","ID"]]
@@ -425,21 +397,41 @@ def run(RMSD_file, feature_csv, bin_models, test_file,feature_directory,accuracy
 	staggering_value=0.2
 	max_angstrom=5
 	first_layer_size=1
-	second_layer_size=1
-	features_to_include=['LLE1', 'LLE2', 'LLE3', 'LLE4', 'LLE5', 'LLE6', 'LTSA1',
-       'LTSA2', 'LTSA3', 'LTSA4', 'LTSA5', 'LTSA6', 'Mod_LLE1', 'Mod_LLE2',
-       'Mod_LLE3', 'Mod_LLE4', 'Mod_LLE5', 'Mod_LLE6', 'Isomap1', 'Isomap2',
-       'Isomap3', 'Isomap4', 'Isomap5', 'Isomap6', 'MDS1', 'MDS2', 'MDS3',
-       'MDS4', 'MDS5', 'MDS6', 'SE1', 'SE2', 'SE3', 'SE4', 'SE5', 'SE6',
-       'tSNE1', 'tSNE2', 'tSNE3', 'tSNE4', 'tSNE5', 'tSNE6', 'blosum62_val1',
-       'blosum62_val2', 'blosum62_val3', 'blosum62_val4', 'blosum62_val5',
-       'blosum62_val6', 'ID', 'tip_pos', 'protrusion', 'length', 'total_charge', 'nr_charged', 'Happiness_mean',
-       'Nr_sad', 'identity', 'similarity', 'Hydropathy',
-       'Hydropathy_diff', 'Access', 'Relacc', 'Scacc', 'Screlacc',
-       'local_CA','simlength'] #deleted tip_res
+	second_layer_size=2
+	feature_csv_opened=pd.read_csv(os.path.abspath(feature_csv))
+	feature_csv_opened=feature_csv_opened[['tip_pos', 'ID','tip_res', 'protrusion', 'sequence', 'length',
+	   'total_charge', 'nr_charged', 'Happiness_mean', 'Nr_sad', 'identity',
+	   'similarity', 'template', 'target', 'Hydropathy', 'Hydropathy_diff',
+	   'Access', 'Relacc', 'Scacc', 'Screlacc', 'Access_avg', 'Relacc_avg',
+	   'Scacc_avg', 'Screlacc_avg', 'local_AA', 'global_AA', 'global_CA',
+	   'simlength', 'local_CA']]
+	feature_csv_opened.to_csv(os.path.abspath(feature_csv), index=False)
+	print(feature_csv)
 
-	nom_df=make_bin_df(RMSD_file, feature_csv, bin_models,staggering_value,max_angstrom,first_layer_size,second_layer_size, accuracy_csv_path)
-	test_df=make_test_df(bin_models, test_file, second_layer_size,max_angstrom,first_layer_size,staggering_value)
+	test_csv_opened=pd.read_csv(os.path.abspath(test_file))
+	test_csv_opened=test_csv_opened[['tip_pos', 'ID','tip_res', 'protrusion', 'sequence', 'length',
+	   'total_charge', 'nr_charged', 'Happiness_mean', 'Nr_sad', 'identity',
+	   'similarity', 'template', 'target', 'Hydropathy', 'Hydropathy_diff',
+	   'Access', 'Relacc', 'Scacc', 'Screlacc', 'Access_avg', 'Relacc_avg',
+	   'Scacc_avg', 'Screlacc_avg', 'local_AA', 'global_AA', 'global_CA',
+	   'simlength', 'local_CA']]
+	test_csv_opened.to_csv(os.path.abspath(test_file), index=False)
+	print(test_csv_opened)
+	RMSD_file_opened=pd.read_csv(os.path.abspath(RMSD_file))
+	RMSD_file_opened=RMSD_file_opened[['tip_pos', 'ID','tip_res', 'protrusion', 'sequence', 'length',
+	   'total_charge', 'nr_charged', 'Happiness_mean', 'Nr_sad', 'identity',
+	   'similarity', 'template', 'target', 'Hydropathy', 'Hydropathy_diff',
+	   'Access', 'Relacc', 'Scacc', 'Screlacc', 'Access_avg', 'Relacc_avg',
+	   'Scacc_avg', 'Screlacc_avg', 'local_AA', 'global_AA', 'global_CA',
+	   'simlength', 'local_CA']]
+	RMSD_file_opened.to_csv(os.path.abspath(RMSD_file), index=False)
+	print(RMSD_file_opened)
+
+	features_to_include=['tip_pos', 'ID','protrusion', 'length', 'total_charge', 'nr_charged','identity', 'similarity','Hydropathy','Hydropathy_diff'] #deleted tip_res
+	features_to_include_noID=['tip_pos','protrusion', 'length', 'total_charge', 'nr_charged','identity', 'similarity','Hydropathy','Hydropathy_diff']
+	print("HERE2",features_to_include_noID)
+	nom_df=make_bin_df(RMSD_file, feature_csv, bin_models,staggering_value,max_angstrom,first_layer_size,second_layer_size, accuracy_csv_path, features_to_include_noID)
+	test_df=make_test_df(bin_models, test_file, second_layer_size,max_angstrom,first_layer_size,staggering_value,  features_to_include_noID)
 	feature_csv=pd.read_csv(os.path.abspath(feature_csv))
 	print(feature_csv)
 	a=test_df.join(feature_csv,on=None)
@@ -497,3 +489,7 @@ run(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6]
 ####MCC=0.6572073279745841
 
 
+
+
+
+#python3 staggered_bins.py ~/sync_project/Feature/train_staggered.csv ~/sync_project/Feature/train_staggered.csv ~/sync_project/staggered_models ~/sync_project/Feature/train_staggered.csv ~/sync_project/Feature/ ~/sync_project/Feature/accuracy_df.csv ~/sync_project/Feature/test_staggered.csv ~/sync_project/Feature/binTHIRD_LAYER.pkl

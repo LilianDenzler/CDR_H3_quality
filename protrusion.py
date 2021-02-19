@@ -32,15 +32,15 @@ def parser(position,residue,chain_type):
 def get_line_len(ppdb):
   #print(ppdb)
   ppdb95=ppdb.loc[ppdb['residue_number'] == 95]
-  ppdb105=ppdb.loc[ppdb['residue_number'] == 105]
-  if ppdb95.empty or ppdb105.empty:
+  ppdb102=ppdb.loc[ppdb['residue_number'] == 102]
+  if ppdb95.empty or ppdb102.empty:
     return None
   P1x=float(ppdb95.x_coord)
   P1y=float(ppdb95.y_coord)
   P1z=float(ppdb95.z_coord)
-  P2x=float(ppdb105.x_coord)
-  P2y=float(ppdb105.y_coord)
-  P2z=float(ppdb105.z_coord)
+  P2x=float(ppdb102.x_coord)
+  P2y=float(ppdb102.y_coord)
+  P2z=float(ppdb102.z_coord)
   #print(P1x,P1y,P1z,P2x,P2y,P2z)
   Lx=P2x-P1x
   Ly=P2y-P1y
@@ -73,7 +73,7 @@ def get_PDB_coords(filename, actual_directory):
     return None,None,None
   line_len,P1x,P1y,P1z,P2x,P2y,P2z,u=get_line_len(ppdb)
   ppdb=ppdb.loc[ppdb['residue_number'] > 95]
-  ppdb=ppdb.loc[ppdb['residue_number'] < 105]
+  ppdb=ppdb.loc[ppdb['residue_number'] < 102]
   #print(ppdb)
   for ind in ppdb.index: 
     Px=float(ppdb['x_coord'][ind])
