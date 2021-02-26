@@ -142,15 +142,16 @@ def calc(line_len,P,Px,Py,Pz,pos,P1x,P1y,P1z,P2x,P2y,P2z,u):
 
 
 
-def place_at_origin(pdb_file):
+def place_at_origin(pdb_file, save_path):
 	if pdb_file.endswith(".pdb")== False:
 		print("this file is not in correct format (i.e. not PDB){}".format(filename))
 	ppdb = PandasPdb().read_pdb(os.path.join(pdb_file))
 	ppdb=ppdb.df['ATOM']
 
 	#get index of start-atom and stop-atom of loop
-	index_95 = ppdb.loc[ppdb['residue_number'] == 95].index.tolist()[0]
-	index_102 = ppdb.loc[ppdb['residue_number'] == 102].index.tolist()[-1]
+	index_95 = ppdb.loc[(ppdb['residue_number'] == 95)& (ppdb['chain_id']=="H")].index.tolist()[0]
+	index_102 = ppdb.loc[(ppdb['residue_number'] == 102)&(ppdb['chain_id']=="H")].index.tolist()[-1]
+
 
 	#get coordinates of full structure and of loop only
 	full_structure=ppdb[["x_coord", "y_coord", "z_coord"]]
@@ -197,12 +198,12 @@ def place_at_origin(pdb_file):
 	rotated_full_df = pd.DataFrame(data=rotated_full_structure, columns=["x_coord", "y_coord", "z_coord"])
 	#print(rotated_full_structure)
 
-	print(rotated_full_df.iloc[500:1200])
+	#print(rotated_full_df.iloc[500:1200])
 	tip_point,close_point,max_length=get_PDB_coords(pdb_file)
 
-	rotated_full_df=flap_loop(rotated_full_df, index_95,index_102)
+	full_flap (rotated_full_df, index_95, index_102, rotation_structure, ppdb95, ppdb102, pdb_file, save_path)
 
-	return (rotated_full_df, rotation_structure, ppdb102)
+	return (0)
 
 
 def flap_loop(rotated_full_df, index_95,index_102):
@@ -214,8 +215,47 @@ def flap_loop(rotated_full_df, index_95,index_102):
 		rotated_full_df.loc[i] = new_loop_vector
 	return (rotated_full_df)
 
+def pdb_integrate(original_rotation_structure, pdb_file, i, save_path):
+	new_structure=pd.DataFrame(data=original_rotation_structure, index=None, columns=["x_coord","y_coord","z_coord"])
+	#pd.concat([pd.DataFrame(["ATOM",9998,"HT2","NTER",0,9999.000,9999.000,9999.000,None,None]), new_structure], ignore_index=True)
+	#pd.concat([pd.DataFrame(["ATOM",9998,"HT1","NTER",0,9999.000,9999.000,9999.000,None,None]), new_structure], ignore_index=True)
+	#pd.concat([new_structure,pd.DataFrame(["ATOM",8888,"OT1","CTER",888,9999.000,9999.000,9999.000,None,None])], ignore_index=True)
+	ppdb = PandasPdb().read_pdb(os.path.join(pdb_file))
+	ppdb.df['ATOM'][['x_coord','y_coord','z_coord']] = new_structure
+
+	#print('./flapped_structures/flapped_structure_'+str(i)+".pdb")
+	path=os.path.join(save_path,"flapped_structure_"+str(i)+".pdb")
+	ppdb.to_pdb(path=path, 
+            records=None, 
+            gz=False, 
+            append_newline=True)
+
+def full_flap (rotated_full_df, index_95, index_102, rotation_structure, ppdb95, ppdb102, pdb_file, save_path):
+	for a in range (50):
+		flapped_full_df=flap_loop(rotated_full_df, index_95,index_102)
+
+		#return to initial position
+		reverse_rotation=rotation_structure.inv()
+		original_rotation_structure=reverse_rotation.apply(flapped_full_df)
+		for i in range(0, np.shape(original_rotation_structure)[0]):
+			#print(i)
+			#for x
+			original_rotation_structure[i, 0]=original_rotation_structure[i, 0]+ppdb95[0,0]
+			#for y
+			original_rotation_structure[i, 1]=original_rotation_structure[i, 1]+ppdb95[0,1]
+			#for z
+			original_rotation_structure[i, 2]=original_rotation_structure[i, 2]+ppdb95[0,2]
+		ppdb102[0,0]=ppdb102[0,0]-ppdb95[0,0]
+		ppdb102[0,1]=ppdb102[0,1]-ppdb95[0,1]
+		ppdb102[0,2]=ppdb102[0,2]-ppdb95[0,2]
+
+		pdb_integrate(original_rotation_structure, pdb_file, a+1, save_path)
+
 
 
 if __name__ == '__main__':
   place_at_origin(sys.argv[1])
   
+
+#./libs/ecalc-master/src/ecalc -p 1F11_1.pdb
+#export ECALCDATA='/serv/www/html_lilian/libs/ecalc-master/data'
